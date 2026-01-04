@@ -1,93 +1,108 @@
-//
-//  RegularSaving.swift
-//  FinanceCalculators
-//
-//  Created by Dale Evans on 19/12/2025.
-//
-
 import SwiftUI
 import Charts
 
 
 struct RegularSavingView: View {
-    @State var principal: Double? = 30000
-    @State var monthlyDeposit: Double? = 300
-    @State var years: Int? = 10
-    @State var annualRate: Double = 10
-    @State var taxBand: String = ""
+    @State var principal: Double = 0
+    @State var monthlyDeposit: Double = 0
+    @State var years: Double = 0
+    @State var annualRate: Double = 0
     @State var result: Double = 0.0
+    
+    var tally: Int = 0
     
     
     var body: some View {
-        VStack(spacing: 20) {
-            Chart {
-                LineMark(
-                        x: .value("Shape Type", 10),
-                        y: .value("Total Count", 10)
-                    )
-                LineMark(
-                         x: .value("Shape Type", 33),
-                         y: .value("Total Count", 55)
-                    )
-                LineMark(
-                         x: .value("Shape Type", 66),
-                         y: .value("Total Count", 88)
-                    )
-            }
+        ScrollView {
+            Spacer()
             
-            Text("You would have \(result)")
+            MyChart()
             
-            TextField("How much do you have now?", value: $principal, format: .number)
-                 .keyboardType(.decimalPad)
-                 .textFieldStyle(.roundedBorder)
             
-           TextField("How much will you save each month?", value: $monthlyDeposit, format: .number)
-                .keyboardType(.decimalPad)
-                .textFieldStyle(.roundedBorder)
-            
-            TextField("How long will you save for?", value: $years, format: .number)
-                .keyboardType(.numberPad)
-                .textFieldStyle(.roundedBorder)
-            
-            TextField("Interest Rate", value: $annualRate, format: .number)
-                .keyboardType(.numberPad)
-                .textFieldStyle(.roundedBorder)
-            
-            Button("Calculate") {
-                if principal != nil && monthlyDeposit != nil && years != nil {
-                    result = calculate(
-                        principal: 30000,
-                        monthlyDeposit: 300,
-                        annualRate: 10,
-                        years: 10
-                    )
+            VStack(spacing: 10) {
+                Text("You would have \(Text("\(result)").foregroundColor(.green))")
+                
+                AmountInputView(amount: principal, label: "How much do you have now?")
+                
+                AmountInputView(amount: monthlyDeposit, label: "How much will you save each month?")
+                
+                AmountInputView(amount: years, label: "How long will you save for?")
+                
+                AmountInputView(amount: annualRate, label: "Interest Rate")
+                
+                Button("Calculate") {
+                    if principal != 0 && monthlyDeposit != 0 && years != 0 {
+                        result = calculate(
+                            principal: principal,
+                            monthlyDeposit: monthlyDeposit,
+                            annualRate: annualRate,
+                            years: years
+                        )
+                    }
                 }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(.green)
+                .clipShape(Capsule())
+                .foregroundStyle(.white)
+                
+                
             }
-
         }.navigationTitle("Regular Saving")
             .padding(.all)
+        
     }
+    
+    //func calculate(principle: Double, monthlyAmount: Double, howLong: Int, interestRate: Double) -> Double {
+    //    let lumpSumGrowth = principle * pow(1 + interestRate / 100, Double(howLong))
+    //
+    //    return principle * pow(1 + interestRate / 100, Double(howLong))
+    //}
+    
+    func calculate(principal: Double, monthlyDeposit: Double, annualRate: Double, years: Double) -> Double {
+        let n: Double = 1 // Compounding frequency (monthly)
+        let r_n = annualRate / n // Periodic interest rate
+        let nt = n * years // Total number of periods
+        
+        // 1. Growth of the initial principal: P(1 + r/n)^(nt)
+        let principalGrowth = principal * pow(1 + r_n, nt)
+        
+        // 2. Growth of the monthly deposits: PMT * [((1 + r/n)^(nt) - 1) / (r/n)]
+        let depositGrowth = monthlyDeposit * ((pow(1 + r_n, nt) - 1) / r_n)
+        
+        print(principalGrowth)
+        
+        return principalGrowth + depositGrowth
+    }
+    
+    struct MyChart: View {
+        // 1. Create a simple data model
+        struct Point: Identifiable {
+            let id = UUID()
+            let x: Int
+            let y: Int
+        }
+        
+        // 2. Do all your math here, outside the body
+        var calculatedData: [Point] {
+            var tally = 0
+            return (1...10).map { i in
+                tally += Int.random(in: 0..<6)
+                return Point(x: i, y: i + tally)
+            }
+        }
+        
+        var body: some View {
+            Chart {
+                // 3. The body only handles "Display"
+                ForEach(calculatedData) { point in
+                    LineMark(
+                        x: .value("X", point.x),
+                        y: .value("Y", point.y)
+                    ).foregroundStyle(.green)
+                }
+            }.frame(height: 300)
+        }
+    }
+    
 }
-
-//func calculate(principle: Double, monthlyAmount: Double, howLong: Int, interestRate: Double) -> Double {
-//    let lumpSumGrowth = principle * pow(1 + interestRate / 100, Double(howLong))
-//    
-//    return principle * pow(1 + interestRate / 100, Double(howLong))
-//}
-
-func calculate(principal: Double, monthlyDeposit: Double, annualRate: Double, years: Double) -> Double {
-    let n: Double = 1 // Compounding frequency (monthly)
-    let r_n = annualRate / n // Periodic interest rate
-    let nt = n * years // Total number of periods
-    
-    // 1. Growth of the initial principal: P(1 + r/n)^(nt)
-    let principalGrowth = principal * pow(1 + r_n, nt)
-    
-    // 2. Growth of the monthly deposits: PMT * [((1 + r/n)^(nt) - 1) / (r/n)]
-    let depositGrowth = monthlyDeposit * ((pow(1 + r_n, nt) - 1) / r_n)
-    
-    print(principalGrowth)
-    
-    return principalGrowth + depositGrowth
-}
-
