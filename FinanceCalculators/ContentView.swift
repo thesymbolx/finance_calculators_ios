@@ -5,8 +5,8 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             List {
-                NavigationLink(destination: RegularSavingView()) {
-                    Text("How much could I have if I save regularly?")
+                NavigationLink(destination: SimpleCompoundInterest()) {
+                    Text("Simple Compound Interest")
                 }
 
             

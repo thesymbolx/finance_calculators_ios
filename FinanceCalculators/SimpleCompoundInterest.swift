@@ -2,15 +2,11 @@ import SwiftUI
 import Charts
 
 
-struct RegularSavingView: View {
+struct SimpleCompoundInterest: View {
     @State var principal: Double = 0
-    @State var monthlyDeposit: Double = 0
     @State var years: Double = 0
     @State var annualRate: Double = 0
     @State var result: Double = 0.0
-    
-    var tally: Int = 0
-    
     
     var body: some View {
         ScrollView {
@@ -22,23 +18,20 @@ struct RegularSavingView: View {
             VStack(spacing: 10) {
                 Text("You would have \(Text("\(result)").foregroundColor(.green))")
                 
-                AmountInputView(amount: principal, label: "How much do you have now?")
+                AmountInputView(amount: $principal, label: "How much do you have now?")
+                                
+                AmountInputView(amount: $years, label: "How long will you save for?")
                 
-                AmountInputView(amount: monthlyDeposit, label: "How much will you save each month?")
-                
-                AmountInputView(amount: years, label: "How long will you save for?")
-                
-                AmountInputView(amount: annualRate, label: "Interest Rate")
+                AmountInputView(amount: $annualRate, label: "Interest Rate")
                 
                 Button("Calculate") {
-                    if principal != 0 && monthlyDeposit != 0 && years != 0 {
-                        result = calculate(
+                        result = compoundInterest(
                             principal: principal,
-                            monthlyDeposit: monthlyDeposit,
                             annualRate: annualRate,
-                            years: years
+                            years: years,
+                            noTimeCompounded: 1
                         )
-                    }
+            
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -51,28 +44,6 @@ struct RegularSavingView: View {
         }.navigationTitle("Regular Saving")
             .padding(.all)
         
-    }
-    
-    //func calculate(principle: Double, monthlyAmount: Double, howLong: Int, interestRate: Double) -> Double {
-    //    let lumpSumGrowth = principle * pow(1 + interestRate / 100, Double(howLong))
-    //
-    //    return principle * pow(1 + interestRate / 100, Double(howLong))
-    //}
-    
-    func calculate(principal: Double, monthlyDeposit: Double, annualRate: Double, years: Double) -> Double {
-        let n: Double = 1 // Compounding frequency (monthly)
-        let r_n = annualRate / n // Periodic interest rate
-        let nt = n * years // Total number of periods
-        
-        // 1. Growth of the initial principal: P(1 + r/n)^(nt)
-        let principalGrowth = principal * pow(1 + r_n, nt)
-        
-        // 2. Growth of the monthly deposits: PMT * [((1 + r/n)^(nt) - 1) / (r/n)]
-        let depositGrowth = monthlyDeposit * ((pow(1 + r_n, nt) - 1) / r_n)
-        
-        print(principalGrowth)
-        
-        return principalGrowth + depositGrowth
     }
     
     struct MyChart: View {
@@ -105,4 +76,14 @@ struct RegularSavingView: View {
         }
     }
     
+}
+
+/**
+            
+ */
+func compoundInterest(principal: Double, annualRate: Double, years: Double, noTimeCompounded: Int) -> Double {
+    let annualRate = annualRate / 100
+    let years_noTimeCompounded = years * Double(noTimeCompounded)
+    
+    return principal * pow(1 + annualRate, years_noTimeCompounded)
 }

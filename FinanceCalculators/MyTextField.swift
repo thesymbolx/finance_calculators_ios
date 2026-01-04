@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AmountInputView: View {
-    @State var amount: Double
+    @Binding var amount: Double
     let label: String
 
     var body: some View {
