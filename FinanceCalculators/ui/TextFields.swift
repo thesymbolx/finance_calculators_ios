@@ -10,16 +10,25 @@ struct AmountInputView: View {
                 .font(.system(size: 16, weight: .bold))
                 .foregroundColor(Color(white: 0.2))
 
-            HStack {
+            HStack() {
                 Text("£")
-                    .font(.system(size: 16))
-                    .foregroundColor(.gray)
+                    .font(.system(size: 18, weight: .bold))
+                    .frame(width: 45, height: 45)
+                    .foregroundColor(.white)
+                    .background(Color(.primary))
+                    .clipShape(
+                            UnevenRoundedRectangle(
+                                topLeadingRadius: 12,
+                                bottomLeadingRadius: 12,
+                                bottomTrailingRadius: 0,
+                                topTrailingRadius: 0
+                            )
+                        )
                 
-                TextField("How much do you have now?", value: $amount, format: .number)
+                TextField("", value: $amount, format: .currency(code: ""))
                     .keyboardType(.decimalPad)
                     .font(.system(size: 16))
             }
-            .padding()
             .frame(height: 45)
             .background(Color.white)
             .overlay(
@@ -27,6 +36,5 @@ struct AmountInputView: View {
                     .stroke(Color.gray.opacity(0.5), lineWidth: 1)
             )
         }
-        .padding()
     }
 }
