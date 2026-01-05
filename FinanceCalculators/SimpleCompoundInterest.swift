@@ -29,7 +29,7 @@ struct SimpleCompoundInterest: View {
                             principal: principal,
                             annualRate: annualRate,
                             years: years,
-                            noTimeCompounded: 1
+                            timesCompounded: 1
                         )
             
                 }
@@ -81,9 +81,9 @@ struct SimpleCompoundInterest: View {
 /**
             
  */
-func compoundInterest(principal: Double, annualRate: Double, years: Double, noTimeCompounded: Int) -> Double {
-    let annualRate = annualRate / 100
-    let years_noTimeCompounded = years * Double(noTimeCompounded)
+func compoundInterest(principal: Double, annualRate: Double, years: Double, timesCompounded: Int) -> Double {
+    let r_n = (annualRate / 100) / Double(timesCompounded)
+    let n_t = Double(timesCompounded) * years
     
-    return principal * pow(1 + annualRate, years_noTimeCompounded)
+    return principal * pow(1 + r_n, n_t)
 }
