@@ -3,7 +3,6 @@ import SwiftUI
 struct NumberInputView: View {
     @Binding var amount: Int
     let label: String
-    let prependSymbol: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {

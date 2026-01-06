@@ -44,16 +44,15 @@ struct CompoundInterestCalculator: View {
                         prependSymbol: "£"
                     )
 
-                    NumberInputView(
-                        amount: $noYears,
-                        label: "How long will you save for?",
-                        prependSymbol: "YY"
-                    )
-
                     AmountInputView(
                         amount: $annualInterest,
                         label: "Interest Rate",
                         prependSymbol: "£"
+                    )
+                    
+                    NumberInputView(
+                        amount: $noYears,
+                        label: "How long will you save for?"
                     )
 
                     Button("Calculate") {
