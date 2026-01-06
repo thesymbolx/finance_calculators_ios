@@ -4,14 +4,6 @@ import Charts
 struct GrowthChart: View {
     @Binding var points: [Point]
     
-    var calculatedData: [Point] {
-        var tally = 0
-        return (1...10).map { i in
-            tally += Int.random(in: 0..<6)
-            return Point(x: i, y: i + tally)
-        }
-    }
-    
     var body: some View {
         Chart {
             ForEach(points) { point in
@@ -27,6 +19,6 @@ struct GrowthChart: View {
 
 struct Point: Identifiable {
     let id = UUID()
-    let x: Int
-    let y: Int
+    let x: Double
+    let y: Double
 }

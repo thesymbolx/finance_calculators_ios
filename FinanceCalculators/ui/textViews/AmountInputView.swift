@@ -1,8 +1,10 @@
 import SwiftUI
 
 struct AmountInputView: View {
-    @Binding var amount: Double
+    @Binding var amount: Decimal
     let label: String
+    let prependSymbol: String
+
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -11,11 +13,11 @@ struct AmountInputView: View {
                 .foregroundColor(Color(white: 0.2))
 
             HStack() {
-                Text("£")
+                Text(prependSymbol)
                     .font(.system(size: 18, weight: .bold))
                     .frame(width: 45, height: 45)
                     .foregroundColor(.white)
-                    .background(Color(.primary))
+                    .background(Color(.secondary))
                     .clipShape(
                             UnevenRoundedRectangle(
                                 topLeadingRadius: 12,
