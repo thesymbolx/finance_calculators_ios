@@ -56,7 +56,7 @@ struct CompoundInterestCalculator: View {
                     )
 
                     Button("Calculate") {
-                        let localResult = compoundInterestWithContribution(
+                        let localResult = compoundInterestWithContribution2(
                             principal: principal,
                             annualInterest: annualInterest,
                             noYears: noYears,
@@ -158,4 +158,144 @@ func compoundInterestWithContribution(
 
     return principalGrowth + contributionGrowth
 
+}
+
+func compoundInterestWithContribution2(
+    principal: Decimal,
+    annualInterest: Decimal,
+    noYears: Int,
+    compoundFrequency: Int,
+    monthlyContribution: Decimal
+) -> Decimal {
+    let principal = Double(truncating: principal as NSNumber)
+    let annualInterest = Double(truncating: annualInterest as NSNumber) / 100.0
+    let compoundFrequency = Double(compoundFrequency)
+    let noYears = Double(noYears)
+    let monthlyContribution = Double(truncating: monthlyContribution as NSNumber)
+    
+    
+
+    let periodicRate = annualInterest / compoundFrequency
+    let totalPeriods = compoundFrequency * noYears
+    let growthFactor = pow(1 + periodicRate, totalPeriods)
+
+    //Compound Interest on Principal: P(1 + r/n)^{nt}
+    let principalGrowth = principal * growthFactor
+
+    //Compound Interest on contributions: P(1 + r/n)^{nt}
+    
+    
+    let numerator = pow(1 + annualInterest / compoundFrequency, compoundFrequency * noYears) - 1
+    let demoninator = pow(1 + periodicRate, compoundFrequency / 12) - 1
+        
+    let contributionGrowth =
+        monthlyContribution * (numerator / demoninator)
+
+
+    return Decimal(principalGrowth + contributionGrowth)
+
+}
+
+
+
+func compoundInterestWithContribution3(
+    principal: Decimal,
+    annualInterest: Decimal,
+    noYears: Int,
+    compoundFrequency: Int,
+    monthlyContribution: Decimal
+) -> Decimal {
+    
+    // Convert to Double for power calculations
+    let r = Double(truncating: annualInterest as NSNumber) / 100.0
+    let n = Double(compoundFrequency)
+    let t = Double(noYears)
+    let pmt = Double(truncating: monthlyContribution as NSNumber)
+    let p = Double(truncating: principal as NSNumber)
+    
+    // 1. Calculate the standard Base Growth Factor: (1 + r/n)
+    let baseFactor = 1.0 + (r / n)
+    
+    // 2. Principal Growth: P * (BaseFactor)^(n*t)
+    let principalGrowth = p * pow(baseFactor, n * t)
+    
+    // 3. Contribution Growth:
+    // Numerator: (BaseFactor)^(n*t) - 1
+    // Denominator: (BaseFactor)^(n/12) - 1  <-- This adjusts for the monthly payments
+    let numerator = pow(baseFactor, n * t) - 1.0
+    let denominator = pow(baseFactor, n / 12.0) - 1.0
+    
+    let contributionGrowth = pmt * (numerator / denominator)
+    
+    return Decimal(principalGrowth + contributionGrowth)
+}
+
+
+
+func fuck(
+    principal: Decimal,
+    annualInterest: Decimal,
+    noYears: Int,
+    compoundFrequency: Int,
+    monthlyContribution: Decimal
+) -> Decimal {
+    let principal = Double(truncating: principal as NSNumber)
+    let r = Double(truncating: annualInterest as NSNumber) / 100.0
+    let n = Double(compoundFrequency)
+    let t = Double(noYears)
+    let monthlyContribution = Double(truncating: monthlyContribution as NSNumber)
+    
+    
+
+    let periodicRate = r / n
+    let totalPeriods = n * t
+    let growthFactor = pow(1 + periodicRate, totalPeriods)
+
+    //Compound Interest on Principal: P(1 + r/n)^{nt}
+    let principalGrowth = principal * growthFactor
+
+    //Compound Interest on contributions: P(1 + r/n)^{nt}
+    
+    
+    let numerator = pow(1 + (r / n), n * t)
+    let demoninator = pow(1 + (r / n), n / 12)
+    let contributionGrowth = monthlyContribution * (numerator / demoninator)
+
+
+    return Decimal(principalGrowth + contributionGrowth)
+
+}
+
+
+
+func you(
+    principal: Decimal,
+    annualInterest: Decimal,
+    noYears: Int,
+    compoundFrequency: Int,
+    monthlyContribution: Decimal
+) -> Decimal {
+    
+    // Convert to Double for power calculations
+    let r = Double(truncating: annualInterest as NSNumber) / 100.0
+    let n = Double(compoundFrequency)
+    let t = Double(noYears)
+    let pmt = Double(truncating: monthlyContribution as NSNumber)
+    let p = Double(truncating: principal as NSNumber)
+    
+    // 1. Calculate the standard Base Growth Factor: (1 + r/n)
+    let baseFactor = 1.0 + (r / n)
+    
+    // 2. Principal Growth: P * (BaseFactor)^(n*t)
+    let principalGrowth = p * pow(baseFactor, n * t)
+    
+    // 3. Contribution Growth:
+    // Numerator: (BaseFactor)^(n*t) - 1
+    // Denominator: (BaseFactor)^(n/12) - 1  <-- This adjusts for the monthly payments
+    let numerator = pow(1.0 + (r / n), n * t) - 1.0
+    let denominator = pow(1.0 + (r / n), n / 12.0) - 1.0
+    
+    let contributionGrowth = pmt * (numerator / denominator)
+    
+    return Decimal(principalGrowth + contributionGrowth)
 }
