@@ -7,7 +7,7 @@ struct Dale: View {
     @State var noYears: Int = 0
     @State var annualInterest: Decimal = 0
     @State var result: String = "£0.00"
-    @State var points: [Point] = [Point(x: 1, y: 2)]
+    @State var points: [Point] = []
 
     var body: some View {
         ScrollView {
@@ -62,7 +62,9 @@ struct Dale: View {
 
                         result = "£\(formattedResult)"
 
-                        points = toPoint(balancePerMonth: localResult.balancePerMonth)
+                        let localPoints = toPoint(balancePerMonth: localResult.balancePerYear)
+                        points = localPoints
+                        print(localPoints)
 
                     }
                     .frame(maxWidth: .infinity)
@@ -85,13 +87,15 @@ private func compoundInterestMonthly(
     annualInterest: Decimal,
     noYears: Int,
     monthlyContribution: Decimal
-) -> (balancePerMonth: [Decimal], total: Decimal) {
-    var balancePerMonth: [Decimal] = []
+) -> (balancePerYear: [[Decimal]], total: Decimal) {
+    var balancePerYear: [[Decimal]] = []
     var daysInMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     let dailyInterestRate = (annualInterest / 100) / 365
     var total = principal
     
     for year in 1...noYears {
+        var balancePerMonth: [Decimal] = []
+        
         if isLeapYear(year) {
             daysInMonths[1] = 29
         } else {
@@ -103,16 +107,18 @@ private func compoundInterestMonthly(
             total += (total * dailyInterestRate) * Decimal(day)
             balancePerMonth.append(total)
         }
+        
+        balancePerYear.append(balancePerMonth)
     }
     
-    return (balancePerMonth, total)
+    return (balancePerYear, total)
 }
 
 private func isLeapYear(_ year: Int) -> Bool {
     return year.isMultiple(of: 4) && (!year.isMultiple(of: 100) || year.isMultiple(of: 400))
 }
 
-private func toPoint(balancePerMonth: [Decimal]) -> [Point] {
+private func toPoint(balancePerMonth: [[Decimal]]) -> [Point] {
     var points: [Point] = []
     
     let handler = NSDecimalNumberHandler(
@@ -124,10 +130,20 @@ private func toPoint(balancePerMonth: [Decimal]) -> [Point] {
         raiseOnDivideByZero: false
     )
     
-    balancePerMonth.enumerated().forEach { index, balance in
-        let rounded = NSDecimalNumber(decimal: balance).rounding(accordingToBehavior: handler)
+    
+    let flat = if balancePerMonth.count > 1 {
+        balancePerMonth.map {
+            $0.max() ?? 0
+        }
+    } else {
+        Array(balancePerMonth.joined())
+    }
+    
+    
+    flat.enumerated().forEach { index, balance in
+        let roundedY = NSDecimalNumber(decimal: balance).rounding(accordingToBehavior: handler)
         
-        points.append(.init(x: Double(index), y: Double(rounded)))
+        points.append(.init(x: Double(index), y: roundedY as Decimal))
     }
     
     return points
