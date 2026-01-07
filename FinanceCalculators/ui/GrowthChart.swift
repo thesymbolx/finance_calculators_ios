@@ -14,17 +14,17 @@ struct GrowthChart: View {
                 .foregroundStyle(Color(.primary))
                 .interpolationMethod(.catmullRom)
                 
-                if points.count < 20 {
+                if points.count < 30 {
                     line.symbol(.circle)
                 } else {
                     line
                 }
             }
         }
-        .frame(height: 300)
+        .frame(height: 250)
         .chartXScale(
             domain: .automatic(includesZero: false),
-            range: .plotDimension(startPadding: 20, endPadding: 20)
+            range: .plotDimension(startPadding: 20, endPadding: 0)
         )
         .chartYScale(
             domain: .automatic(includesZero: false),
