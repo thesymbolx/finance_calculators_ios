@@ -11,9 +11,10 @@ struct GrowthChart: View {
                     x: .value("X", point.x),
                     y: .value("Y", point.y)
                 ).foregroundStyle(Color(.primary))
-                    .symbol(.circle)
+                 //   .symbol(.circle)
             }
         }.frame(height: 300)
+            .chartXScale(domain: 0...120)
     }
 }
 
@@ -21,4 +22,26 @@ struct Point: Identifiable {
     let id = UUID()
     let x: Double
     let y: Double
+}
+
+struct DecimalGrowthChart: View {
+    @Binding var points: [Point]
+    
+    var body: some View {
+        Chart {
+            ForEach(points) { point in
+                LineMark(
+                    x: .value("X", point.x),
+                    y: .value("Y", point.y)
+                ).foregroundStyle(Color(.primary))
+                    .symbol(.circle)
+            }
+        }.frame(height: 300)
+    }
+}
+
+struct DecimalPoint: Identifiable {
+    let id = UUID()
+    let x: Decimal
+    let y: Decimal
 }

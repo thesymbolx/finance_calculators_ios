@@ -17,7 +17,7 @@ struct AmountInputView: View {
                     .font(.system(size: 18, weight: .bold))
                     .frame(width: 45, height: 45)
                     .foregroundColor(.white)
-                    .background(Color(.secondary))
+                    .background(Color(.primary))
                     .clipShape(
                             UnevenRoundedRectangle(
                                 topLeadingRadius: 12,
