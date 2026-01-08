@@ -25,80 +25,113 @@ struct Dale: View {
                     return content.offset(y: minY < 0 ? -minY * 0.5 : 0)
 
                 }
+                .padding(.all)
+                
 
-                VStack {
-                    Spacer()
-                    Text(
-                        "You would have \( Text("\(result)").foregroundColor(Color(.primary)).bold())"
-                    )
-                    .padding(.vertical)
-
-                    VStack(spacing: 30) {
-                        AmountInputView(
-                            amount: $principal,
-                            label: "How much do you have now?",
-                            prependSymbol: "£"
+                ZStack {
+                    VStack {
+                        Spacer()
+                        Text(
+                            "You would have \( Text("\(result)").foregroundColor(Color(.primary)).bold())"
                         )
+                        .padding(.vertical)
 
-                        AmountInputView(
-                            amount: $monthlyContribution,
-                            label: "How much will you save each month?",
-                            prependSymbol: "£"
-                        )
+                        VStack(spacing: 30) {
+                            AmountInputView(
+                                amount: $principal,
+                                label: "How much do you have now?",
+                                prependSymbol: "£"
+                            )
 
-                        AmountInputView(
-                            amount: $annualInterest,
-                            label: "Interest Rate",
-                            prependSymbol: "£"
-                        )
+                            AmountInputView(
+                                amount: $monthlyContribution,
+                                label: "How much will you save each month?",
+                                prependSymbol: "£"
+                            )
 
-                        NumberInputView(
-                            amount: $noYears,
-                            label: "How long will you save for?"
-                        )
+                            AmountInputView(
+                                amount: $annualInterest,
+                                label: "Interest Rate",
+                                prependSymbol: "£"
+                            )
 
-                        Button("Calculate") {
+                            NumberInputView(
+                                amount: $noYears,
+                                label: "How long will you save for?"
+                            )
 
-                            withAnimation(.linear) {
-                                scrollPosition = 0
+                            Button("Calculate") {
+
+                                withAnimation(.linear) {
+                                    scrollPosition = 0
+                                }
+
+                                let localResult = compoundInterestMonthly(
+                                    principal: principal,
+                                    annualInterest: annualInterest,
+                                    noYears: noYears,
+                                    monthlyContribution: monthlyContribution
+                                )
+
+                                let formattedResult = localResult.total
+                                    .formatted(
+                                        .number.precision(.fractionLength(2))
+                                    )
+
+                                result = "£\(formattedResult)"
+
+                                let localPoints = toPoint(
+                                    balancePerMonth: localResult.balancePerYear
+                                )
+                                points = localPoints
                             }
-
-                            let localResult = compoundInterestMonthly(
-                                principal: principal,
-                                annualInterest: annualInterest,
-                                noYears: noYears,
-                                monthlyContribution: monthlyContribution
-                            )
-
-                            let formattedResult = localResult.total.formatted(
-                                .number.precision(.fractionLength(2))
-                            )
-
-                            result = "£\(formattedResult)"
-
-                            let localPoints = toPoint(
-                                balancePerMonth: localResult.balancePerYear
-                            )
-                            points = localPoints
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .bold()
+                            .background(Color(.primary))
+                            .clipShape(Capsule())
+                            .foregroundStyle(.white)
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .bold()
-                        .background(Color(.primary))
-                        .clipShape(Capsule())
-                        .foregroundStyle(.white)
+
                     }
+                    .padding(.all)
+                    .zIndex(1)
 
                 }
-                .background(.white)
-                .zIndex(1)
+                .background(.background)
+                .clipShape(
+                    UnevenRoundedRectangle(
+                        topLeadingRadius: 25,
+                        bottomLeadingRadius: 0,
+                        bottomTrailingRadius: 0,
+                        topTrailingRadius: 25
+                    )
+                )
+                .background {
+                    UnevenRoundedRectangle(
+                        topLeadingRadius: 25,
+                        bottomLeadingRadius: 0,
+                        bottomTrailingRadius: 0,
+                        topTrailingRadius: 25
+                    )
+                    .fill(Color.white) // The layer that casts the shadow
+                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                    .mask(
+                        Rectangle()
+                            .padding(.top, -20) // Extend mask UP to show top shadow
+                            // We do NOT extend the bottom, so the bottom shadow gets cut off
+                    )
+                }
+
             }
             .scrollTargetLayout()
         }
+        .background(.background)
         .coordinateSpace(name: "SCROLL")
         .scrollPosition(id: $scrollPosition)
         .navigationTitle("Compound Interest Calculator")
-        .padding(.all)
+       
+       
 
     }
 }
