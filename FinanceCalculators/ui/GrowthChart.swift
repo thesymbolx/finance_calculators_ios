@@ -6,18 +6,26 @@ struct GrowthChart: View {
     
     var body: some View {
         Chart {
-            ForEach(points) { point in
-                let line = LineMark(
-                    x: .value("X", point.x),
-                    y: .value("Y", point.y)
-                )
-                .foregroundStyle(Color(.primary))
-                .interpolationMethod(.catmullRom)
+            if points.isEmpty {
+                RuleMark(y: .value("Y", 0)).foregroundStyle(.clear)
+                RuleMark(y: .value("Y", 1000)).foregroundStyle(.clear)
                 
-                if points.count < 30 {
-                    line.symbol(.circle)
-                } else {
-                    line
+                RuleMark(x: .value("X", 0)).foregroundStyle(.clear)
+                RuleMark(x: .value("X", 10)).foregroundStyle(.clear)
+            } else {
+                ForEach(points) { point in
+                    let line = LineMark(
+                        x: .value("X", point.x),
+                        y: .value("Y", point.y)
+                    )
+                    .foregroundStyle(Color(.primary))
+                    .interpolationMethod(.catmullRom)
+                    
+                    if points.count < 30 {
+                        line.symbol(.circle)
+                    } else {
+                        line
+                    }
                 }
             }
         }

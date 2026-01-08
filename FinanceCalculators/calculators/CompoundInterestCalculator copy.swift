@@ -7,7 +7,7 @@ struct Dale: View {
     @State var noYears: Int = 0
     @State var annualInterest: Decimal = 0
     @State var result: String = "£0.00"
-    @State var points: [Point] = [Point(x: 1, y: 2)]
+    @State var points: [Point] = []
 
     @State private var scrollPosition: Int? = 0
 
