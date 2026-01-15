@@ -25,7 +25,6 @@ struct RegularSaverCalculator: View {
 
                 }
                 .padding(.all)
-                
 
                 ZStack {
                     CompundInterestCalculatorBodyView(
@@ -53,11 +52,16 @@ struct RegularSaverCalculator: View {
                         topTrailingRadius: 25
                     )
                     .fill(Color.white)
-                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                    .shadow(
+                        color: Color.black.opacity(0.1),
+                        radius: 10,
+                        x: 0,
+                        y: 5
+                    )
                     .mask(
                         Rectangle()
-                            .padding(.top, -20) 
-                           
+                            .padding(.top, -20)
+
                     )
                 }
 
@@ -68,13 +72,11 @@ struct RegularSaverCalculator: View {
         .coordinateSpace(name: "SCROLL")
         .scrollPosition(id: $scrollPosition)
         .navigationTitle("Compound Interest Calculator")
-       
-       
 
     }
 }
 
-struct CompundInterestCalculatorBodyView: View {
+private struct CompundInterestCalculatorBodyView: View {
     @Binding var principal: Decimal
     @Binding var monthlyContribution: Decimal
     @Binding var noYears: Int
@@ -84,7 +86,7 @@ struct CompundInterestCalculatorBodyView: View {
     @State var result: String = "£0.00"
 
     @State private var scrollPosition: Int? = 0
-    
+
     var body: some View {
         VStack {
             Spacer()
