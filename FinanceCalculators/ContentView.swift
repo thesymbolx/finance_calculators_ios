@@ -8,7 +8,7 @@ struct ContentView: View {
                 NavigationLink(destination: CompoundInterestCalculator()) {
                     Text("Compound Interest Calculator")
                 }
-                NavigationLink(destination: Dale()) {
+                NavigationLink(destination: RegularSaverCalculator()) {
                     Text("Compound Interest Calculator")
                 }
                 Text("Number 3")

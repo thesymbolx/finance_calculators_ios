@@ -1,12 +1,11 @@
 import Charts
 import SwiftUI
 
-struct Dale: View {
+struct RegularSaverCalculator: View {
     @State var principal: Decimal = 0
     @State var monthlyContribution: Decimal = 0
     @State var noYears: Int = 0
     @State var annualInterest: Decimal = 0
-    @State var result: String = "£0.00"
     @State var points: [Point] = []
 
     @State private var scrollPosition: Int? = 0
@@ -29,74 +28,13 @@ struct Dale: View {
                 
 
                 ZStack {
-                    VStack {
-                        Spacer()
-                        Text(
-                            "You would have \( Text("\(result)").foregroundColor(Color(.primary)).bold())"
-                        )
-                        .padding(.vertical)
-
-                        VStack(spacing: 30) {
-                            AmountInputView(
-                                amount: $principal,
-                                label: "How much do you have now?",
-                                prependSymbol: "£"
-                            )
-
-                            AmountInputView(
-                                amount: $monthlyContribution,
-                                label: "How much will you save each month?",
-                                prependSymbol: "£"
-                            )
-
-                            AmountInputView(
-                                amount: $annualInterest,
-                                label: "Interest Rate",
-                                prependSymbol: "£"
-                            )
-
-                            NumberInputView(
-                                amount: $noYears,
-                                label: "How long will you save for?"
-                            )
-
-                            Button("Calculate") {
-
-                                withAnimation(.linear) {
-                                    scrollPosition = 0
-                                }
-
-                                let localResult = compoundInterestMonthly(
-                                    principal: principal,
-                                    annualInterest: annualInterest,
-                                    noYears: noYears,
-                                    monthlyContribution: monthlyContribution
-                                )
-
-                                let formattedResult = localResult.total
-                                    .formatted(
-                                        .number.precision(.fractionLength(2))
-                                    )
-
-                                result = "£\(formattedResult)"
-
-                                let localPoints = toPoint(
-                                    balancePerMonth: localResult.balancePerYear
-                                )
-                                points = localPoints
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .bold()
-                            .background(Color(.primary))
-                            .clipShape(Capsule())
-                            .foregroundStyle(.white)
-                        }
-
-                    }
-                    .padding(.all)
-                    .zIndex(1)
-
+                    CompundInterestCalculatorBodyView(
+                        principal: $principal,
+                        monthlyContribution: $monthlyContribution,
+                        noYears: $noYears,
+                        annualInterest: $annualInterest,
+                        points: $points
+                    )
                 }
                 .background(.background)
                 .clipShape(
@@ -114,12 +52,12 @@ struct Dale: View {
                         bottomTrailingRadius: 0,
                         topTrailingRadius: 25
                     )
-                    .fill(Color.white) // The layer that casts the shadow
+                    .fill(Color.white)
                     .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
                     .mask(
                         Rectangle()
-                            .padding(.top, -20) // Extend mask UP to show top shadow
-                            // We do NOT extend the bottom, so the bottom shadow gets cut off
+                            .padding(.top, -20) 
+                           
                     )
                 }
 
@@ -133,6 +71,88 @@ struct Dale: View {
        
        
 
+    }
+}
+
+struct CompundInterestCalculatorBodyView: View {
+    @Binding var principal: Decimal
+    @Binding var monthlyContribution: Decimal
+    @Binding var noYears: Int
+    @Binding var annualInterest: Decimal
+    @Binding var points: [Point]
+
+    @State var result: String = "£0.00"
+
+    @State private var scrollPosition: Int? = 0
+    
+    var body: some View {
+        VStack {
+            Spacer()
+            Text(
+                "You would have \( Text("\(result)").foregroundColor(Color(.primary)).bold())"
+            )
+            .padding(.vertical)
+
+            VStack(spacing: 30) {
+                AmountInputView(
+                    amount: $principal,
+                    label: "How much do you have now?",
+                    prependSymbol: "£"
+                )
+
+                AmountInputView(
+                    amount: $monthlyContribution,
+                    label: "How much will you save each month?",
+                    prependSymbol: "£"
+                )
+
+                AmountInputView(
+                    amount: $annualInterest,
+                    label: "Interest Rate",
+                    prependSymbol: "£"
+                )
+
+                NumberInputView(
+                    amount: $noYears,
+                    label: "How long will you save for?"
+                )
+
+                Button("Calculate") {
+
+                    withAnimation(.linear) {
+                        scrollPosition = 0
+                    }
+
+                    let localResult = compoundInterestMonthly(
+                        principal: principal,
+                        annualInterest: annualInterest,
+                        noYears: noYears,
+                        monthlyContribution: monthlyContribution
+                    )
+
+                    let formattedResult = localResult.total
+                        .formatted(
+                            .number.precision(.fractionLength(2))
+                        )
+
+                    result = "£\(formattedResult)"
+
+                    let localPoints = toPoint(
+                        balancePerMonth: localResult.balancePerYear
+                    )
+                    points = localPoints
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .bold()
+                .background(Color(.primary))
+                .clipShape(Capsule())
+                .foregroundStyle(.white)
+            }
+
+        }
+        .padding(.all)
+        .zIndex(1)
     }
 }
 
