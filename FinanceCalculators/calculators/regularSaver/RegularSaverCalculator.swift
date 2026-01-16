@@ -11,7 +11,9 @@ struct CalculatorInput: Equatable {
 struct RegularSaverCalculator: View {
     @State var viewModel: RegularSaverVM = RegularSaverVM()
     @State private var input = CalculatorInput()
+    
     @State private var scrollPosition: Int? = 0
+    private let scrollSpaceName = "SCROLL_SPACE"
 
     var body: some View {
         ScrollView {
@@ -22,7 +24,7 @@ struct RegularSaverCalculator: View {
                 }
                 .zIndex(0)
                 .visualEffect { content, proxy in
-                    let minY = proxy.frame(in: .named("SCROLL")).minY
+                    let minY = proxy.frame(in: .named(scrollSpaceName)).minY
                     return content.offset(y: minY < 0 ? -minY * 0.5 : 0)
 
                 }
@@ -49,7 +51,7 @@ struct RegularSaverCalculator: View {
             .scrollTargetLayout()
         }
         .background(.background)
-        .coordinateSpace(name: "SCROLL")
+        .coordinateSpace(name: scrollSpaceName)
         .scrollPosition(id: $scrollPosition)
         .navigationTitle("Compound Interest Calculator")
     }
@@ -98,13 +100,10 @@ private struct CompundInterestCalculatorBodyView: View {
 
     var contentBody: some View {
         VStack {
-            let result =
-                total
-                .formatted(
-                    .number.precision(.fractionLength(2))
-                )
+            let result = total.formatted(.number.precision(.fractionLength(2)))
 
             Spacer()
+            
             Text(
                 "You would have \( Text("\(result)").foregroundColor(Color(.primary)).bold())"
             )
