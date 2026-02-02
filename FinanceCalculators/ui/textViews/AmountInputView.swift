@@ -31,7 +31,6 @@ struct AmountInputView: View {
                     .keyboardType(.decimalPad)
                     .font(.system(size: 16))
             }
-            .frame(height: 45)
             .background(Color.white)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)

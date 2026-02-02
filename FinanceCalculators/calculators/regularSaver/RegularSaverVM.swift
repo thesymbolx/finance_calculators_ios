@@ -1,21 +1,42 @@
 import Combine
 import SwiftUI
 
-struct AmountModel {
-    var total: Decimal
-    var graphPoints: [Point]
-}
-
 @Observable
-class RegularSaverVM {
-    var amount: AmountModel = AmountModel(total: 0, graphPoints: [])
+class RegularSaverVM: ObservableObject {
+    struct AmountModel {
+        var total: Decimal
+        var graphPoints: [Point]
+    }
 
-    func compoundInterestMonthly(
-        principal: Decimal,
-        annualInterest: Decimal,
-        noYears: Int,
-        monthlyContribution: Decimal
-    ) {
+    enum Frequency: String, CaseIterable {
+        case MONTHLY = "Monthly"
+        case ANNUALLY = "Annually"
+    }
+
+    struct CalculatorInput: Equatable {
+        var principal: Decimal = 0
+        var monthlyContribution: Decimal = 0
+        var noYears: Int = 0
+        var annualInterest: Decimal = 0
+        var frequency: Frequency = .MONTHLY
+    }
+    
+    var calculatorInput = CalculatorInput()
+    private(set) var graphBalances: AmountModel = AmountModel(total: 0, graphPoints: [])
+    
+    func calculate() {
+        if(calculatorInput.frequency == .MONTHLY) {
+            compoundInterestMonthly()
+        } else if(calculatorInput.frequency == .ANNUALLY) {
+            compoundInterestYearly()
+        }
+    }
+
+    private func compoundInterestMonthly() {
+        let noYears = calculatorInput.noYears
+        let principal = calculatorInput.principal
+        let annualInterest = calculatorInput.annualInterest
+        let monthlyContribution = calculatorInput.monthlyContribution
         var balancePerYear: [[Decimal]] = []
         var daysInMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
         let dailyInterestRate = (annualInterest / 100) / 365
@@ -39,7 +60,44 @@ class RegularSaverVM {
             balancePerYear.append(balancePerMonth)
         }
         
-        amount = AmountModel(
+        graphBalances = AmountModel(
+            total: total,
+            graphPoints: toPoint(balancePerYear: balancePerYear)
+        )
+    }
+    
+    private func compoundInterestYearly() {
+        let noYears = calculatorInput.noYears
+        let principal = calculatorInput.principal
+        let annualInterest = calculatorInput.annualInterest
+        let monthlyContribution = calculatorInput.monthlyContribution
+        var balancePerYear: [[Decimal]] = []
+        var daysInMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        let dailyInterestRate = (annualInterest / 100) / 365
+        var total = principal
+        var accuredInterest: Decimal = 0
+
+        for year in 1...noYears {
+            var balancePerMonth: [Decimal] = []
+
+            if isLeapYear(year) {
+                daysInMonths[1] = 29
+            } else {
+                daysInMonths[1] = 28
+            }
+
+            daysInMonths.forEach { day in
+                total += monthlyContribution
+                accuredInterest += (total * dailyInterestRate) * Decimal(day)
+                balancePerMonth.append(total)
+            }
+            
+            balancePerMonth[balancePerMonth.count - 1] += accuredInterest
+
+            balancePerYear.append(balancePerMonth)
+        }
+        
+        graphBalances = AmountModel(
             total: total,
             graphPoints: toPoint(balancePerYear: balancePerYear)
         )

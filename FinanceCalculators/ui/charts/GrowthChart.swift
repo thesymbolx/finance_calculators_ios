@@ -2,7 +2,7 @@ import SwiftUI
 import Charts
 
 struct GrowthChart: View {
-    @Binding var points: [Point]
+    let points: [Point]
     
     var body: some View {
         Chart {
@@ -39,11 +39,8 @@ struct GrowthChart: View {
             range: .plotDimension(startPadding: 20, endPadding: 20)
         )
         .chartYAxis {
-            // Uses "£3B", "£500M", "£10k" etc.
             AxisMarks(format: .currency(code: "GBP").notation(.compactName))
         }
-        // 3. Animate changes smoothly
-      //  .animation(.spring(response: 0, dampingFraction: 1), value: points)
     }
 }
 

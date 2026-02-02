@@ -1,22 +1,8 @@
 import Charts
 import SwiftUI
 
-fileprivate enum Frequency: String, CaseIterable {
-    case MONTHLY = "Monthly"
-    case ANNUALLY = "Annually"
-}
-
-struct CalculatorInput: Equatable {
-    var principal: Decimal = 0
-    var monthlyContribution: Decimal = 0
-    var noYears: Int = 0
-    var annualInterest: Decimal = 0
-    fileprivate var frequency: Frequency = .MONTHLY
-}
-
 struct RegularSaverCalculator: View {
     @State var viewModel: RegularSaverVM = RegularSaverVM()
-    @State private var input = CalculatorInput()
 
     @State private var scrollPosition: Int? = 0
     private let scrollSpaceName = "SCROLL_SPACE"
@@ -26,7 +12,7 @@ struct RegularSaverCalculator: View {
             VStack {
                 VStack {
                     Spacer()
-                    GrowthChart(points: $viewModel.amount.graphPoints)
+                    GrowthChart(points: viewModel.graphBalances.graphPoints)
                 }
                 .zIndex(0)
                 .visualEffect { content, proxy in
@@ -37,15 +23,10 @@ struct RegularSaverCalculator: View {
                 .padding(.all)
 
                 CompundInterestCalculatorBodyView(
-                    input: $input,
-                    total: viewModel.amount.total,
+                    input: $viewModel.calculatorInput,
+                    total: viewModel.graphBalances.total,
                     onCalculate: {
-                        viewModel.compoundInterestMonthly(
-                            principal: input.principal,
-                            annualInterest: input.annualInterest,
-                            noYears: input.noYears,
-                            monthlyContribution: input.monthlyContribution
-                        )
+                        viewModel.calculate()
 
                         withAnimation(.linear) {
                             scrollPosition = 0
@@ -64,7 +45,7 @@ struct RegularSaverCalculator: View {
 }
 
 private struct CompundInterestCalculatorBodyView: View {
-    @Binding var input: CalculatorInput
+    @Binding var input: RegularSaverVM.CalculatorInput
 
     let total: Decimal
     let onCalculate: () -> Void
@@ -105,50 +86,49 @@ private struct CompundInterestCalculatorBodyView: View {
     }
 
     var contentBody: some View {
-        VStack {
+        VStack(spacing: 30) {
             let result = total.formatted(.number.precision(.fractionLength(2)))
-
-            Spacer()
+            
+            let balanceText = Text("\(result)")
+                .foregroundColor(Color(.primary))
+                .bold()
 
             Text(
-                "You would have \( Text("\(result)").foregroundColor(Color(.primary)).bold())"
-            )
-            .padding(.vertical)
+                "You would have \(balanceText)"
+            ).padding(.top, 20)
             
             frequencyPicker
+            
+            AmountInputView(
+                amount: $input.principal,
+                label: "How much do you have now?",
+                prependSymbol: "£"
+            )
 
-            VStack(spacing: 30) {
-                AmountInputView(
-                    amount: $input.principal,
-                    label: "How much do you have now?",
-                    prependSymbol: "£"
-                )
+            AmountInputView(
+                amount: $input.monthlyContribution,
+                label: "How much will you save each month?",
+                prependSymbol: "£"
+            )
 
-                AmountInputView(
-                    amount: $input.monthlyContribution,
-                    label: "How much will you save each month?",
-                    prependSymbol: "£"
-                )
+            AmountInputView(
+                amount: $input.annualInterest,
+                label: "Interest Rate",
+                prependSymbol: "£"
+            )
 
-                AmountInputView(
-                    amount: $input.annualInterest,
-                    label: "Interest Rate",
-                    prependSymbol: "£"
-                )
+            NumberInputView(
+                amount: $input.noYears,
+                label: "How long will you save for?"
+            )
 
-                NumberInputView(
-                    amount: $input.noYears,
-                    label: "How long will you save for?"
-                )
-
-                Button("Calculate", action: onCalculate)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .bold()
-                    .background(Color(.primary))
-                    .clipShape(Capsule())
-                    .foregroundStyle(.white)
-            }
+            Button("Calculate", action: onCalculate)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .bold()
+                .background(Color(.primary))
+                .clipShape(Capsule())
+                .foregroundStyle(.white)
 
         }
         .padding(.all)
@@ -161,8 +141,8 @@ private struct CompundInterestCalculatorBodyView: View {
                 .foregroundColor(Color(white: 0.2))
             
             Picker("Frequency", selection: $input.frequency) {
-                Text("Monthly").tag(Frequency.MONTHLY)
-                Text("Annually").tag(Frequency.ANNUALLY)
+                Text("Monthly").tag(RegularSaverVM.Frequency.MONTHLY)
+                Text("Annually").tag(RegularSaverVM.Frequency.ANNUALLY)
             }
             .pickerStyle(.segmented)
         }
