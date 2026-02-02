@@ -9,7 +9,7 @@ struct ContentView: View {
                     Text("Compound Interest Calculator")
                 }
                 NavigationLink(destination: RegularSaverCalculator()) {
-                    Text("Compound Interest Calculator")
+                    Text("Regular Saver Calculator")
                 }
                 Text("Number 3")
                 Text("Number 4")
