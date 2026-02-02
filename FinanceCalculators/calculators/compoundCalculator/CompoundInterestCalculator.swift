@@ -1,7 +1,7 @@
 import Charts
 import SwiftUI
 
-internal enum Frequency: Int, CaseIterable {
+fileprivate enum Frequency: Int, CaseIterable {
     case daily = 365
     case monthly = 12
     case yearly = 1
@@ -13,7 +13,7 @@ struct CompoundInterestCalculator: View {
     @State var noYears: Int = 0
     @State var annualInterest: Decimal = 0
     @State var result: String = "£0.00"
-    @State var selectedFrequency: Frequency = Frequency.yearly
+    @State fileprivate var selectedFrequency: Frequency = Frequency.yearly
 
     var body: some View {
         ScrollView {
@@ -83,7 +83,7 @@ struct CompoundInterestCalculator: View {
 }
 
 struct FrequencyPicker: View {
-    @Binding var selectedFrequency: Frequency
+    @Binding fileprivate var selectedFrequency: Frequency
 
     var body: some View {
         VStack(alignment: .leading) {

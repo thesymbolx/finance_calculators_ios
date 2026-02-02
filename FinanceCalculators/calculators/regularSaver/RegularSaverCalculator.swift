@@ -1,17 +1,23 @@
 import Charts
 import SwiftUI
 
+fileprivate enum Frequency: String, CaseIterable {
+    case MONTHLY = "Monthly"
+    case ANNUALLY = "Annually"
+}
+
 struct CalculatorInput: Equatable {
     var principal: Decimal = 0
     var monthlyContribution: Decimal = 0
     var noYears: Int = 0
     var annualInterest: Decimal = 0
+    fileprivate var frequency: Frequency = .MONTHLY
 }
 
 struct RegularSaverCalculator: View {
     @State var viewModel: RegularSaverVM = RegularSaverVM()
     @State private var input = CalculatorInput()
-    
+
     @State private var scrollPosition: Int? = 0
     private let scrollSpaceName = "SCROLL_SPACE"
 
@@ -103,11 +109,13 @@ private struct CompundInterestCalculatorBodyView: View {
             let result = total.formatted(.number.precision(.fractionLength(2)))
 
             Spacer()
-            
+
             Text(
                 "You would have \( Text("\(result)").foregroundColor(Color(.primary)).bold())"
             )
             .padding(.vertical)
+            
+            frequencyPicker
 
             VStack(spacing: 30) {
                 AmountInputView(
@@ -144,5 +152,19 @@ private struct CompundInterestCalculatorBodyView: View {
 
         }
         .padding(.all)
+    }
+
+    var frequencyPicker: some View {
+        VStack(alignment: .leading) {
+            Text("Compounding rate")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(Color(white: 0.2))
+            
+            Picker("Frequency", selection: $input.frequency) {
+                Text("Monthly").tag(Frequency.MONTHLY)
+                Text("Annually").tag(Frequency.ANNUALLY)
+            }
+            .pickerStyle(.segmented)
+        }
     }
 }
