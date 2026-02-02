@@ -24,6 +24,15 @@ class RegularSaverVM: ObservableObject {
     var calculatorInput = CalculatorInput()
     private(set) var graphBalances: AmountModel = AmountModel(total: 0, graphPoints: [])
     
+    var isFormValid: Bool {
+            let isPrincipalValid = !calculatorInput.principal.isNaN
+            let isContributionValid = !calculatorInput.monthlyContribution.isNaN
+            let isInterestValid = !calculatorInput.annualInterest.isNaN
+            let isYearsValid = calculatorInput.noYears > 0
+            
+            return isPrincipalValid && isContributionValid && isInterestValid && isYearsValid
+        }
+    
     func calculate() {
         if(calculatorInput.frequency == .MONTHLY) {
             compoundInterestMonthly()
@@ -50,11 +59,11 @@ class RegularSaverVM: ObservableObject {
             } else {
                 daysInMonths[1] = 28
             }
-
+            
             daysInMonths.forEach { day in
                 total += monthlyContribution
-                total += (total * dailyInterestRate) * Decimal(day)
-                balancePerMonth.append(total)
+                let accuredInterest = (total * dailyInterestRate) * Decimal(day)
+                balancePerMonth.append(total + accuredInterest)
             }
 
             balancePerYear.append(balancePerMonth)

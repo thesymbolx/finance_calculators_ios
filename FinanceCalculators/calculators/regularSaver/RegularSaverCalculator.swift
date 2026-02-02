@@ -31,7 +31,8 @@ struct RegularSaverCalculator: View {
                         withAnimation(.linear) {
                             scrollPosition = 0
                         }
-                    }
+                    },
+                    isButtonEnabled: viewModel.isFormValid
                 ).zIndex(1)
 
             }
@@ -49,6 +50,7 @@ private struct CompundInterestCalculatorBodyView: View {
 
     let total: Decimal
     let onCalculate: () -> Void
+    let isButtonEnabled: Bool
 
     var body: some View {
         ZStack {
@@ -121,14 +123,15 @@ private struct CompundInterestCalculatorBodyView: View {
                 amount: $input.noYears,
                 label: "How long will you save for?"
             )
-
+            
             Button("Calculate", action: onCalculate)
                 .frame(maxWidth: .infinity)
                 .padding()
                 .bold()
-                .background(Color(.primary))
+                .background(isButtonEnabled ? Color(.primary) : Color.gray)
                 .clipShape(Capsule())
                 .foregroundStyle(.white)
+                .disabled(!isButtonEnabled)
 
         }
         .padding(.all)
