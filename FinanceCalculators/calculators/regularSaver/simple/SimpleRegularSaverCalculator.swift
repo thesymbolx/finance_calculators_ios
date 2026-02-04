@@ -41,7 +41,7 @@ struct SimpleRegularSaverCalculator: View {
         .background(.background)
         .coordinateSpace(name: scrollSpaceName)
         .scrollPosition(id: $scrollPosition)
-        .navigationTitle("Compound Interest Calculator")
+        .navigationTitle("Regular Saver")
     }
 }
 
