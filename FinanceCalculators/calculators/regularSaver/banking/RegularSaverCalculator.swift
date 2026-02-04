@@ -144,8 +144,8 @@ private struct CompundInterestCalculatorBodyView: View {
                 .foregroundColor(Color(white: 0.2))
             
             Picker("Frequency", selection: $input.frequency) {
-                Text("Monthly").tag(RegularSaverVM.Frequency.MONTHLY)
-                Text("Annually").tag(RegularSaverVM.Frequency.ANNUALLY)
+                Text("Monthly").tag(CompoundFrequency.MONTHLY)
+                Text("Annually").tag(CompoundFrequency.ANNUALLY)
             }
             .pickerStyle(.segmented)
         }

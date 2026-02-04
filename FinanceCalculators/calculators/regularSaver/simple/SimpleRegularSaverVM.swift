@@ -2,27 +2,13 @@ import Combine
 import Foundation
 import SwiftUI
 
-extension Decimal {
-    func rounded(_ scale: Int, _ mode: NSDecimalNumber.RoundingMode) -> Decimal
-    {
-        var result = Decimal()
-        var source = self
-        NSDecimalRound(&result, &source, scale, mode)
-        return result
-    }
-}
 
 @Observable
-class RegularSaverVM: ObservableObject {
+class SimpleRegularSaverVM: ObservableObject {
 
     struct AmountModel {
         var total: Decimal
         var graphPoints: [Point]
-    }
-
-    enum Frequency: String, CaseIterable {
-        case MONTHLY = "Monthly"
-        case ANNUALLY = "Annually"
     }
 
     struct CalculatorInput: Equatable {
@@ -30,7 +16,7 @@ class RegularSaverVM: ObservableObject {
         var monthlyContribution: Decimal = 0
         var noYears: Int = 0
         var annualInterest: Decimal = 0
-        var frequency: Frequency = .MONTHLY
+        var frequency: CompoundFrequency = .MONTHLY
     }
 
     var calculatorInput = CalculatorInput()
@@ -67,24 +53,22 @@ class RegularSaverVM: ObservableObject {
         let monthlyContribution = calculatorInput.monthlyContribution
 
         var balancePerYear: [[Decimal]] = []
-        var daysInMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-        let dailyInterestRate = (annualInterest / 100) / 365
+        let monthlyInterestRate = (annualInterest / 100) / 12
         var total = principal
         var accruedInterest: Decimal = 0
 
-        for year in 0..<noYears {
+        for _ in 0..<noYears {
             var balancePerMonth: [Decimal] = []
 
-            daysInMonths[1] = getDaysInFeb(currentYear: year)
-
-            for (monthIndex, daysInMonth) in daysInMonths.enumerated() {
+            for month in 1...12 {
 
                 total += monthlyContribution
 
-                let interestForMonth =
-                    (total * dailyInterestRate) * Decimal(daysInMonth)
+                let interestForMonth = total * monthlyInterestRate
                 accruedInterest += interestForMonth
+                
+                print(accruedInterest)
 
                 switch compoundFrequency {
                     case .MONTHLY:
@@ -92,7 +76,7 @@ class RegularSaverVM: ObservableObject {
                         accruedInterest = 0
 
                     case .ANNUALLY:
-                        if monthIndex == 11 {
+                        if month == 12 {
                             total += accruedInterest.rounded(2, .plain)
                             accruedInterest = 0
                         }
@@ -105,21 +89,6 @@ class RegularSaverVM: ObservableObject {
         }
 
         return balancePerYear
-    }
-
-    private func getDaysInFeb(currentYear: Int) -> Int {
-        let currentYear =
-            Calendar
-            .current
-            .component(.year, from: Date())
-            .advanced(by: currentYear)
-
-        let isLeapYear =
-            currentYear.isMultiple(of: 4)
-            && (!currentYear.isMultiple(of: 100)
-                || currentYear.isMultiple(of: 400))
-
-        return isLeapYear ? 29 : 28
     }
 
     private func toPoint(balancePerYear: [[Decimal]]) -> [Point] {
