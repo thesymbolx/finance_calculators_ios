@@ -21,6 +21,10 @@ struct ContentView: View {
                     Text("Simple Regular Saver Calculator")
                 }.listRowBackground(roseColor)
                 
+                NavigationLink(destination: ParisView()) {
+                    Text("Paris")
+                }.listRowBackground(roseColor)
+                
                 Text("Number 3")
                 Text("Number 4")
                 Text("Number 5")
