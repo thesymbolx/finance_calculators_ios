@@ -25,7 +25,7 @@ struct EmissionsChart: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .textCase(.uppercase)
-                    
+                                        
                     HStack(alignment: .firstTextBaseline) {
                         Text("\(selected.y as NSDecimalNumber)")
                             .font(.system(size: 32, weight: .bold, design: .rounded))
@@ -36,7 +36,7 @@ struct EmissionsChart: View {
                             .foregroundStyle(.secondary)
                         
                         // Added context pill for the screenshot
-                        Text("Above Target")
+                        Text("60 Above Target")
                             .font(.caption2.bold())
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
