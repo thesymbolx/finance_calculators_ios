@@ -139,7 +139,7 @@ private struct CompundInterestCalculatorBodyView: View {
 
     var frequencyPicker: some View {
         VStack(alignment: .leading) {
-            Text("Compounding rate")
+            Text("Interest paid")
                 .font(.system(size: 16, weight: .bold))
                 .foregroundColor(Color(white: 0.2))
             

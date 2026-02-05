@@ -2,7 +2,6 @@ import Combine
 import Foundation
 import SwiftUI
 
-
 @Observable
 class SimpleRegularSaverVM: ObservableObject {
 
@@ -45,44 +44,47 @@ class SimpleRegularSaverVM: ObservableObject {
         )
     }
 
+    /// Commercial-standard calculation: Uses a flat Gross monthly rate (Annual / 12) for simplicity.
+    ///
+    /// Key Logic:
+    /// 1. Timing: Deposits are added at the START of the month (optimistic view).
+    /// 2. Rate: Treats input as Gross (Rate/12). This allows Monthly Payouts to correctly outperform Annual Payouts.
+    /// 3. Payouts: 'Monthly' compounds immediately (exponential curve), while 'Annually' holds interest in a pot (stepped line).
     private func calculateBalance() -> [[Decimal]] {
-        let compoundFrequency = calculatorInput.frequency
         let noYears = calculatorInput.noYears
-        let principal = calculatorInput.principal
-        let annualInterest = calculatorInput.annualInterest
         let monthlyContribution = calculatorInput.monthlyContribution
+        let annualInterest = calculatorInput.annualInterest
+        let principal = calculatorInput.principal
+        let interestPaidFrequency = calculatorInput.frequency
 
-        var balancePerYear: [[Decimal]] = []
+        let monthlyRate = (annualInterest / 100) / 12
 
-        let monthlyInterestRate = (annualInterest / 100) / 12
-        var total = principal
+        var balance = principal
         var accruedInterest: Decimal = 0
+        var balancePerYear: [[Decimal]] = []
 
         for _ in 0..<noYears {
             var balancePerMonth: [Decimal] = []
 
             for month in 1...12 {
+                balance += monthlyContribution
 
-                total += monthlyContribution
+                let interest = balance * monthlyRate
 
-                let interestForMonth = total * monthlyInterestRate
-                accruedInterest += interestForMonth
-                
-                print(accruedInterest)
+                switch interestPaidFrequency {
+                case .MONTHLY:
+                    balance += interest.rounded(2, .plain)
 
-                switch compoundFrequency {
-                    case .MONTHLY:
-                        total += accruedInterest.rounded(2, .plain)
+                case .ANNUALLY:
+                    accruedInterest += interest
+
+                    if month == 12 {
+                        balance += accruedInterest.rounded(2, .plain)
                         accruedInterest = 0
-
-                    case .ANNUALLY:
-                        if month == 12 {
-                            total += accruedInterest.rounded(2, .plain)
-                            accruedInterest = 0
-                        }
+                    }
                 }
 
-                balancePerMonth.append(total)
+                balancePerMonth.append(balance)
             }
 
             balancePerYear.append(balancePerMonth)

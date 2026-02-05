@@ -54,6 +54,13 @@ class RegularSaverVM: ObservableObject {
         )
     }
 
+    /// Calculates the projected balance using banking-standard "Daily Accrual."
+    ///
+    /// Key Logic:
+    /// 1. Precision: Uses actual days in the month (e.g., Jan=31, Feb=28/29).
+    /// 2. Timing: Deposits are added at the START of the month (earning full interest).
+    /// 3. Rate: Uses a daily rate (Annual / 365) for maximum accuracy.
+    /// 4. Rounding: Interest is accrued precisely, then rounded (2dp) only when paid out (Monthly or Annually).
     private func calculateBalance() -> [[Decimal]] {
         let compoundFrequency = calculatorInput.frequency
         let noYears = calculatorInput.noYears
@@ -82,15 +89,15 @@ class RegularSaverVM: ObservableObject {
                 accruedInterest += interestForMonth
 
                 switch compoundFrequency {
-                    case .MONTHLY:
+                case .MONTHLY:
+                    total += accruedInterest.rounded(2, .plain)
+                    accruedInterest = 0
+
+                case .ANNUALLY:
+                    if monthIndex == 11 {
                         total += accruedInterest.rounded(2, .plain)
                         accruedInterest = 0
-
-                    case .ANNUALLY:
-                        if monthIndex == 11 {
-                            total += accruedInterest.rounded(2, .plain)
-                            accruedInterest = 0
-                        }
+                    }
                 }
 
                 balancePerMonth.append(total)
