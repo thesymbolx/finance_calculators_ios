@@ -112,20 +112,51 @@ private struct CompundInterestCalculatorBodyView: View {
         ]
 
     var contentBody: some View {
-            // You usually need a NavigationStack at the root level for NavigationLink to work
-            VStack(spacing: 0) { // Changed spacing to 0 to handle dividers manually
-
+            VStack(spacing: 0) {
+                
                 // Header
                 Text("Select Location")
                     .font(.title2)
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.bottom, 20) // Add padding here since we removed VStack spacing
-
-                // SOLUTION: Use ForEach instead of List
-                ForEach(countries) { country in
+                    .padding(.bottom, 20)
+                
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.gray)
                     
-                    // NavigationLink handles the tap & transition
+                    Text("Search countries...")
+                        .foregroundColor(.gray.opacity(0.8))
+                    
+                    Spacer()
+                    
+                    // Optional: Mic icon or Filter button
+                    Image(systemName: "mic.fill")
+                        .foregroundColor(.gray)
+                        .font(.caption)
+                }
+                .padding(.vertical, 10)
+                .padding(.horizontal, 12)
+                .background(Color(.systemGray6))
+                .cornerRadius(10)
+                .padding(.bottom, 15)
+
+                ForEach(countries) { country in
+                    let isSelected = country.name == "Australia"
+                    
+                    // MOCKED DATA: Determine status based on country for the screenshot
+                    let status: (text: String, color: Color) = {
+                        switch country.name {
+                        case "Australia": return ("13% Above Target", .orange)
+                        case "Argentina": return ("On Track", .green)
+                        case "Brazil": return ("Trending Down", .green)
+                        case "Canada": return ("5% Above Target", .orange)
+                        case "China": return ("Critical Increase", .red)
+                        case "France": return ("Below Target", .green)
+                        default: return ("Data Stable", .gray)
+                        }
+                    }()
+                    
                     NavigationLink(
                         destination: Text("Details for \(country.name)")
                     ) {
@@ -133,27 +164,46 @@ private struct CompundInterestCalculatorBodyView: View {
                             Text(country.flag)
                                 .font(.largeTitle)
 
-                            VStack(alignment: .leading) {
+                            VStack(alignment: .leading, spacing: 4) {
                                 Text(country.name)
                                     .font(.headline)
-                                    .foregroundColor(.primary) // Ensure text is black/white, not blue link color
-                                Text("Tap to view emissions")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.primary)
+                                
+                                // NEW: Dot Summary Row
+                                HStack(spacing: 6) {
+                                    Circle()
+                                        .fill(status.color)
+                                        .frame(width: 8, height: 8)
+                                    
+                                    Text(status.text)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
                             }
                             
                             Spacer()
                             
-                            // Optional: Add a chevron to show it's clickable
-                            Image(systemName: "chevron.right")
+                            // Icon Logic
+                            Image(systemName: isSelected ? "checkmark.circle.fill" : "chevron.right")
                                 .font(.caption)
-                                .foregroundColor(.gray)
+                                .foregroundColor(isSelected ? .blue : .gray.opacity(0.5))
                         }
-                        .padding(.vertical, 8)
+                        // Styling for the "Selected" state
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 12)
+                        .background(isSelected ? Color.blue.opacity(0.1) : Color.clear)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.blue.opacity(0.3), lineWidth: isSelected ? 1 : 0)
+                        )
                     }
+                    .padding(.vertical, 4)
                     
-                    // Manually add the separator line that List usually provides
-                    Divider()
+                    if !isSelected {
+                        Divider()
+                            .padding(.leading, 50)
+                    }
                 }
             }
             .padding(.all)
