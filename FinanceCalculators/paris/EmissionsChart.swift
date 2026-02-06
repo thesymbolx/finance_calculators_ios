@@ -20,6 +20,11 @@ struct EmissionsChart: View {
             // 1. Header: Hardcoded to show the "Active" state
             // This simulates what the user sees while dragging
             if let selected = selectedPoint {
+                Text("Australia")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.primary)
+                
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Year 2023")
                         .font(.caption)
@@ -54,7 +59,7 @@ struct EmissionsChart: View {
                     .lineStyle(StrokeStyle(lineWidth: 2, dash: [5, 5]))
                     .foregroundStyle(.red)
                     .annotation(position: .bottom, alignment: .trailing) {
-                        Text("Paris Goal (450)")
+                        Text("NDC Target (450)")
                             .font(.caption2.bold())
                             .foregroundStyle(.red)
                             .padding(4)

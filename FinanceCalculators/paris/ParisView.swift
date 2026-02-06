@@ -41,7 +41,7 @@ struct ParisView: View {
         .background(.background)
         .coordinateSpace(name: scrollSpaceName)
         .scrollPosition(id: $scrollPosition)
-        .navigationTitle("Paris Agreement Target")
+        .navigationTitle("NDC Target")
     }
 }
 
@@ -115,7 +115,7 @@ private struct CompundInterestCalculatorBodyView: View {
             VStack(spacing: 0) {
                 
                 // Header
-                Text("Select Location")
+                Text("Select Country")
                     .font(.title2)
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -129,11 +129,6 @@ private struct CompundInterestCalculatorBodyView: View {
                         .foregroundColor(.gray.opacity(0.8))
                     
                     Spacer()
-                    
-                    // Optional: Mic icon or Filter button
-                    Image(systemName: "mic.fill")
-                        .foregroundColor(.gray)
-                        .font(.caption)
                 }
                 .padding(.vertical, 10)
                 .padding(.horizontal, 12)
@@ -148,12 +143,12 @@ private struct CompundInterestCalculatorBodyView: View {
                     let status: (text: String, color: Color) = {
                         switch country.name {
                         case "Australia": return ("13% Above Target", .orange)
-                        case "Argentina": return ("On Track", .green)
-                        case "Brazil": return ("Trending Down", .green)
-                        case "Canada": return ("5% Above Target", .orange)
-                        case "China": return ("Critical Increase", .red)
-                        case "France": return ("Below Target", .green)
-                        default: return ("Data Stable", .gray)
+                        case "Argentina": return ("2% Below Target", .green)  // Added value
+                        case "Brazil":    return ("8% Below Target", .green)  // Changed from "Trending" for consistency
+                        case "Canada":    return ("5% Above Target", .orange)
+                        case "China":     return ("20% Above Target", .red)
+                        case "France":    return ("5% Below Target", .green)
+                        default: return ("On target", .gray)
                         }
                     }()
                     
