@@ -69,7 +69,7 @@ private struct CalculatorHeader: View {
                 .fontWeight(.bold)
                 .foregroundColor(Color(.primary))
             
-            Text("In Year 2023")
+            Text("By Year 2023")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)
