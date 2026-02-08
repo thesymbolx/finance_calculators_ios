@@ -4,14 +4,17 @@ import SwiftUI
 struct RegularSaverCalculator: View {
     @State var viewModel: RegularSaverVM = RegularSaverVM()
 
-    @State private var scrollPosition: Int? = 0
+    @State private var scrollPosition: Int? = nil
     private let scrollSpaceName = "SCROLL_SPACE"
 
     var body: some View {
         ScrollView {
             VStack {
                 VStack {
-                    Spacer()
+                    Color.clear
+                        .frame(height: 1)
+                        .id(0)
+                    
                     CalculatorHeader(
                         input: $viewModel.state
                     )
@@ -51,8 +54,21 @@ private struct CalculatorHeader: View {
     @Binding var input: RegularSaverVM.ViewState
 
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
             Spacer()
+            
+            let result = input.balance.formatted(.number.precision(.fractionLength(2)))
+
+            let balanceText = Text("\(result)")
+                .foregroundColor(Color(.primary))
+                .bold()
+
+            Text("You would have \(balanceText)")
+            
+            Text("text text text text")
+            
+            Text("text text text text")
+            
             GrowthChart(points: input.graphPoints)
         }
     }
@@ -102,15 +118,7 @@ private struct CompundInterestCalculatorBodyView: View {
 
     var contentBody: some View {
         VStack(spacing: 30) {
-            let result = total.formatted(.number.precision(.fractionLength(2)))
-
-            let balanceText = Text("\(result)")
-                .foregroundColor(Color(.primary))
-                .bold()
-
-            Text(
-                "You would have \(balanceText)"
-            ).padding(.top, 20)
+            
 
             frequencyPicker
 
