@@ -16,7 +16,7 @@ struct RegularSaverCalculator: View {
                         .id(0)
                     
                     CalculatorHeader(
-                        input: $viewModel.state
+                        state: $viewModel.state
                     )
                 }
                 .zIndex(0)
@@ -51,25 +51,34 @@ struct RegularSaverCalculator: View {
 }
 
 private struct CalculatorHeader: View {
-    @Binding var input: RegularSaverVM.ViewState
+    @Binding var state: RegularSaverVM.ViewState
 
     var body: some View {
         VStack(alignment: .leading) {
             Spacer()
             
-            let result = input.balance.formatted(.number.precision(.fractionLength(2)))
+            let result = state.balance.formatted(.number.precision(.fractionLength(2)))
+            let interestEarned = state.interestEarned.formatted(.number.precision(.fractionLength(2)))
 
             let balanceText = Text("\(result)")
                 .foregroundColor(Color(.primary))
                 .bold()
-
-            Text("You would have \(balanceText)")
             
-            Text("text text text text")
+            Text("£\(balanceText)")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .foregroundColor(Color(.primary))
             
-            Text("text text text text")
+            Text("In Year 2023")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
             
-            GrowthChart(points: input.graphPoints)
+            Text("Interest £\(interestEarned)")
+                .font(.subheadline.bold())
+                .foregroundStyle(.secondary)
+            
+            GrowthChart(points: state.graphPoints)
         }
     }
 }
@@ -118,8 +127,6 @@ private struct CompundInterestCalculatorBodyView: View {
 
     var contentBody: some View {
         VStack(spacing: 30) {
-            
-
             frequencyPicker
 
             AmountInputView(
@@ -160,7 +167,7 @@ private struct CompundInterestCalculatorBodyView: View {
 
     var frequencyPicker: some View {
         VStack(alignment: .leading) {
-            Text("Compounding rate")
+            Text("Interest Paid")
                 .font(.system(size: 16, weight: .bold))
                 .foregroundColor(Color(white: 0.2))
 

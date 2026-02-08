@@ -17,6 +17,7 @@ class RegularSaverVM: ObservableObject {
     struct ViewState {
         var graphPoints: [Point] = []
         var balance: Decimal = 0
+        var interestEarned: Decimal = 0
         var principal: Decimal = 0
         var monthlyContribution: Decimal = 0
         var noYears: Int = 0
@@ -37,10 +38,11 @@ class RegularSaverVM: ObservableObject {
     }
 
     func calculate() {
-        let balancePerYear = calculateBalance()
+        let (balancePerYear, interestEarned) = calculateBalance()
         let endingBalance = balancePerYear.last!.last!
     
         state.balance = endingBalance
+        state.interestEarned = interestEarned
         state.graphPoints =  toPoint(balancePerYear: balancePerYear)
     }
 
@@ -51,7 +53,7 @@ class RegularSaverVM: ObservableObject {
     /// 2. Timing: Deposits are added at the START of the month (earning full interest).
     /// 3. Rate: Uses a daily rate (Annual / 365) for maximum accuracy.
     /// 4. Rounding: Interest is accrued precisely, then rounded (2dp) only when paid out (Monthly or Annually).
-    private func calculateBalance() -> [[Decimal]] {
+    private func calculateBalance() -> (balancesPerYear: [[Decimal]], interestEarned: Decimal) {
         let compoundFrequency = state.frequency
         let noYears = state.noYears
         let principal = state.principal
@@ -64,6 +66,7 @@ class RegularSaverVM: ObservableObject {
         let dailyInterestRate = (annualInterest / 100) / 365
         var total = principal
         var accruedInterest: Decimal = 0
+        var totalInterestEarned: Decimal = 0
 
         for year in 0..<noYears {
             var balancePerMonth: [Decimal] = []
@@ -81,11 +84,12 @@ class RegularSaverVM: ObservableObject {
                 switch compoundFrequency {
                 case .MONTHLY:
                     total += accruedInterest.rounded(2, .plain)
+                    totalInterestEarned += accruedInterest
                     accruedInterest = 0
-
                 case .ANNUALLY:
                     if monthIndex == 11 {
                         total += accruedInterest.rounded(2, .plain)
+                        totalInterestEarned += accruedInterest
                         accruedInterest = 0
                     }
                 }
@@ -96,7 +100,7 @@ class RegularSaverVM: ObservableObject {
             balancePerYear.append(balancePerMonth)
         }
 
-        return balancePerYear
+        return (balancePerYear, totalInterestEarned.rounded(2, .plain))
     }
 
     private func getDaysInFeb(currentYear: Int) -> Int {
