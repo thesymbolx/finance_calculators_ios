@@ -38,12 +38,71 @@ class RegularSaverVM: ObservableObject {
     }
 
     func calculate() {
-        let (balancePerYear, interestEarned) = calculateBalance()
+        let (balancePerYear, interestEarned) = calculateBalanceAdjustedStartDate()
         let endingBalance = balancePerYear.last!.last!
     
         state.balance = endingBalance
         state.interestEarned = interestEarned
         state.graphPoints =  toPoint(balancePerYear: balancePerYear)
+    }
+    
+    private func calculateBalanceAdjustedStartDate() -> (balancesPerYear: [[Decimal]], interestEarned: Decimal) {
+        let compoundFrequency = state.frequency
+        let noYears = state.noYears
+        let principal = state.principal
+        let annualInterest = state.annualInterest
+        let monthlyContribution = state.monthlyContribution
+
+        var balancePerYear: [[Decimal]] = []
+        var daysInMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+        let dailyInterestRate = (annualInterest / 100) / 365
+        var total = principal
+        var accruedInterest: Decimal = 0
+        var totalInterestEarned: Decimal = 0
+        
+        let startMonthIndex = Calendar.current.component(.month, from: Date()) - 1
+        
+        for year in 0..<noYears {
+            var balancePerMonth: [Decimal] = []
+
+            let yearOffset = startMonthIndex > 1 ? 1 : 0
+            daysInMonths[1] = getDaysInFeb(currentYear: year + yearOffset)
+            
+            for monthOffset in 0..<12 {
+                // Determine if Feb falls in the Current Year or Next Year
+                // If we start in March (Index 2) or later, the next Feb is next year.
+                let currentMonthIndex = (startMonthIndex + monthOffset) % 12
+                let daysInCurrentMonth = daysInMonths[currentMonthIndex]
+                
+                total += monthlyContribution
+
+                let interestForMonth =
+                    (total * dailyInterestRate) * Decimal(daysInCurrentMonth)
+                accruedInterest += interestForMonth
+                
+                print(accruedInterest)
+                
+                switch compoundFrequency {
+                case .MONTHLY:
+                    total += accruedInterest.rounded(2, .plain)
+                    totalInterestEarned += accruedInterest
+                    accruedInterest = 0
+                case .ANNUALLY:
+                    if currentMonthIndex == 11 {
+                        total += accruedInterest.rounded(2, .plain)
+                        totalInterestEarned += accruedInterest
+                        accruedInterest = 0
+                    }
+                }
+
+                balancePerMonth.append(total)
+            }
+
+            balancePerYear.append(balancePerMonth)
+        }
+
+        return (balancePerYear, totalInterestEarned.rounded(2, .plain))
     }
 
     /// Calculates the projected balance using banking-standard "Daily Accrual."
