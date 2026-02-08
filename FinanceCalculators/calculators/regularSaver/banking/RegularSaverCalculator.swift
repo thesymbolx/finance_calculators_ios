@@ -64,15 +64,14 @@ private struct CalculatorHeader: View {
                 .foregroundColor(Color(.primary))
                 .bold()
             
+            Text("By January of 2023")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            
             Text("£\(balanceText)")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundColor(Color(.primary))
-            
-            Text("By Year 2023")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
             
             Text("Interest £\(interestEarned)")
                 .font(.subheadline.bold())

@@ -51,7 +51,7 @@ struct GrowthChart: View {
         )
         .chartYScale(
             domain: .automatic(includesZero: false),
-            range: .plotDimension(startPadding: 10, endPadding: 10)
+            range: .plotDimension(startPadding: 0, endPadding: 10)
         )
         .chartYAxis {
             AxisMarks(format: .currency(code: "GBP").notation(.compactName))
