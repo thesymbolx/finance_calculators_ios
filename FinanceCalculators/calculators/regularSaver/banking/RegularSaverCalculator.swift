@@ -12,7 +12,9 @@ struct RegularSaverCalculator: View {
             VStack {
                 VStack {
                     Spacer()
-                    GrowthChart(points: viewModel.graphBalances.graphPoints)
+                    CalculatorHeader(
+                        input: $viewModel.state
+                    )
                 }
                 .zIndex(0)
                 .visualEffect { content, proxy in
@@ -23,8 +25,8 @@ struct RegularSaverCalculator: View {
                 .padding(.all)
 
                 CompundInterestCalculatorBodyView(
-                    input: $viewModel.calculatorInput,
-                    total: viewModel.graphBalances.total,
+                    input: $viewModel.state,
+                    total: viewModel.state.balance,
                     onCalculate: {
                         viewModel.calculate()
 
@@ -45,8 +47,19 @@ struct RegularSaverCalculator: View {
     }
 }
 
+private struct CalculatorHeader: View {
+    @Binding var input: RegularSaverVM.ViewState
+
+    var body: some View {
+        VStack {
+            Spacer()
+            GrowthChart(points: input.graphPoints)
+        }
+    }
+}
+
 private struct CompundInterestCalculatorBodyView: View {
-    @Binding var input: RegularSaverVM.CalculatorInput
+    @Binding var input: RegularSaverVM.ViewState
 
     let total: Decimal
     let onCalculate: () -> Void
@@ -90,7 +103,7 @@ private struct CompundInterestCalculatorBodyView: View {
     var contentBody: some View {
         VStack(spacing: 30) {
             let result = total.formatted(.number.precision(.fractionLength(2)))
-            
+
             let balanceText = Text("\(result)")
                 .foregroundColor(Color(.primary))
                 .bold()
@@ -98,9 +111,9 @@ private struct CompundInterestCalculatorBodyView: View {
             Text(
                 "You would have \(balanceText)"
             ).padding(.top, 20)
-            
+
             frequencyPicker
-            
+
             AmountInputView(
                 amount: $input.principal,
                 label: "How much do you have now?",
@@ -123,7 +136,7 @@ private struct CompundInterestCalculatorBodyView: View {
                 amount: $input.noYears,
                 label: "How long will you save for?"
             )
-            
+
             Button("Calculate", action: onCalculate)
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -142,7 +155,7 @@ private struct CompundInterestCalculatorBodyView: View {
             Text("Compounding rate")
                 .font(.system(size: 16, weight: .bold))
                 .foregroundColor(Color(white: 0.2))
-            
+
             Picker("Frequency", selection: $input.frequency) {
                 Text("Monthly").tag(CompoundFrequency.MONTHLY)
                 Text("Annually").tag(CompoundFrequency.ANNUALLY)

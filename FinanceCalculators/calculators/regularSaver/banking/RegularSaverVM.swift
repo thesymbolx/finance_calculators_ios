@@ -14,13 +14,9 @@ extension Decimal {
 
 @Observable
 class RegularSaverVM: ObservableObject {
-
-    struct AmountModel {
-        var total: Decimal
-        var graphPoints: [Point]
-    }
-
-    struct CalculatorInput: Equatable {
+    struct ViewState {
+        var graphPoints: [Point] = []
+        var balance: Decimal = 0
         var principal: Decimal = 0
         var monthlyContribution: Decimal = 0
         var noYears: Int = 0
@@ -28,17 +24,13 @@ class RegularSaverVM: ObservableObject {
         var frequency: CompoundFrequency = .MONTHLY
     }
 
-    var calculatorInput = CalculatorInput()
-    private(set) var graphBalances: AmountModel = AmountModel(
-        total: 0,
-        graphPoints: []
-    )
+    var state = ViewState()
 
     var isFormValid: Bool {
-        let isPrincipalValid = !calculatorInput.principal.isNaN
-        let isContributionValid = !calculatorInput.monthlyContribution.isNaN
-        let isInterestValid = !calculatorInput.annualInterest.isNaN
-        let isYearsValid = calculatorInput.noYears > 0
+        let isPrincipalValid = !state.principal.isNaN
+        let isContributionValid = !state.monthlyContribution.isNaN
+        let isInterestValid = !state.annualInterest.isNaN
+        let isYearsValid = state.noYears > 0
 
         return isPrincipalValid && isContributionValid && isInterestValid
             && isYearsValid
@@ -47,11 +39,9 @@ class RegularSaverVM: ObservableObject {
     func calculate() {
         let balancePerYear = calculateBalance()
         let endingBalance = balancePerYear.last!.last!
-
-        graphBalances = AmountModel(
-            total: endingBalance,
-            graphPoints: toPoint(balancePerYear: balancePerYear)
-        )
+    
+        state.balance = endingBalance
+        state.graphPoints =  toPoint(balancePerYear: balancePerYear)
     }
 
     /// Calculates the projected balance using banking-standard "Daily Accrual."
@@ -62,11 +52,11 @@ class RegularSaverVM: ObservableObject {
     /// 3. Rate: Uses a daily rate (Annual / 365) for maximum accuracy.
     /// 4. Rounding: Interest is accrued precisely, then rounded (2dp) only when paid out (Monthly or Annually).
     private func calculateBalance() -> [[Decimal]] {
-        let compoundFrequency = calculatorInput.frequency
-        let noYears = calculatorInput.noYears
-        let principal = calculatorInput.principal
-        let annualInterest = calculatorInput.annualInterest
-        let monthlyContribution = calculatorInput.monthlyContribution
+        let compoundFrequency = state.frequency
+        let noYears = state.noYears
+        let principal = state.principal
+        let annualInterest = state.annualInterest
+        let monthlyContribution = state.monthlyContribution
 
         var balancePerYear: [[Decimal]] = []
         var daysInMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
