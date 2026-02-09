@@ -148,7 +148,8 @@ private struct CompundInterestCalculatorBodyView: View {
 
             NumberInputView(
                 amount: $input.noYears,
-                label: "How long will you save for?"
+                label: "How long will you save for?",
+                prependSymbol: "Y"
             )
 
             Button("Calculate", action: onCalculate)
@@ -167,7 +168,8 @@ private struct CompundInterestCalculatorBodyView: View {
     var frequencyPicker: some View {
         VStack(alignment: .leading) {
             Text("Interest Paid")
-                .font(.headline)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(Color.black.opacity(0.9))
 
             Picker("Frequency", selection: $input.frequency) {
                 Text("Monthly").tag(CompoundFrequency.MONTHLY)

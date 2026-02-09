@@ -121,7 +121,8 @@ private struct CompundInterestCalculatorBodyView: View {
 
             NumberInputView(
                 amount: $input.noYears,
-                label: "How long will you save for?"
+                label: "How long will you save for?",
+                prependSymbol: "Y"
             )
             
             Button("Calculate", action: onCalculate)

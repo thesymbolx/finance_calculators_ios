@@ -8,9 +8,10 @@ struct AmountInputView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(label)
-                .font(.headline)
-                .foregroundColor(Color(white: 0.2))
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(Color.black.opacity(0.9))
 
+            
             HStack(spacing: 0) {
                 Text(prependSymbol)
                     .font(.system(size: 18, weight: .bold))
