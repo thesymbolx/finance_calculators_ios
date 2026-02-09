@@ -23,8 +23,10 @@ struct AmountInputView: View {
                             bottomTrailingRadius: 0,
                             topTrailingRadius: 0
                         ).stroke(Color(.primary), lineWidth: 2)
+                            .background(Color(.primary).opacity(0.1))
                     )
-
+                
+                
                 TextField("", value: $amount, format: .currency(code: ""))
                     .keyboardType(.decimalPad)
                     .font(.system(size: 16))
