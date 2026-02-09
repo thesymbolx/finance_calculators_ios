@@ -5,30 +5,37 @@ struct NumberInputView: View {
     let label: String
     let prependSymbol: String
 
-
     var body: some View {
+
         VStack(alignment: .leading, spacing: 8) {
             Text(label)
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(Color.black.opacity(0.85))
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(Color.black.opacity(0.9))
 
-            
             HStack(spacing: 0) {
                 Text(prependSymbol)
                     .font(.system(size: 18, weight: .bold))
                     .frame(width: 45, height: 45)
                     .foregroundColor(Color(.primary))
+                    .background(
+                        UnevenRoundedRectangle(
+                            topLeadingRadius: 12,
+                            bottomLeadingRadius: 12,
+                            bottomTrailingRadius: 0,
+                            topTrailingRadius: 0
+                        )
+                        .fill(Color(.primary).opacity(0.1))
+                    )
                     .overlay(
                         UnevenRoundedRectangle(
                             topLeadingRadius: 12,
                             bottomLeadingRadius: 12,
                             bottomTrailingRadius: 0,
                             topTrailingRadius: 0
-                        ).stroke(Color(.primary), lineWidth: 2)
-                            .background(Color(.primary).opacity(0.1))
+                        )
+                        .stroke(Color(.primary), lineWidth: 2)
                     )
-                
-                
+
                 TextField("", value: $amount, format: .currency(code: ""))
                     .keyboardType(.decimalPad)
                     .font(.system(size: 16))
