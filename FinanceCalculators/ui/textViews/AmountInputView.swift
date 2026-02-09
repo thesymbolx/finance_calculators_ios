@@ -8,7 +8,7 @@ struct AmountInputView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(label)
-                .font(.system(size: 16, weight: .bold))
+                .font(.headline)
                 .foregroundColor(Color(white: 0.2))
 
             HStack(spacing: 0) {
