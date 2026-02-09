@@ -61,7 +61,9 @@ class RegularSaverVM: ObservableObject {
         var accruedInterest: Decimal = 0
         var totalInterestEarned: Decimal = 0
         
-        let startMonthIndex = Calendar.current.component(.month, from: Date()) - 1
+        //Start on the next full month to avoid complext logic of adjusting for the partial current month
+        let nextMonthDate = Calendar.current.date(byAdding: .month, value: 1, to: Date())
+        let startMonthIndex = Calendar.current.component(.month, from: nextMonthDate) - 1
         
         for year in 0..<noYears {
             var balancePerMonth: [Decimal] = []
