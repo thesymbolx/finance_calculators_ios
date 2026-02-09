@@ -99,7 +99,7 @@ class RegularSaverVM: ObservableObject {
                     totalInterestEarned += accruedInterest
                     accruedInterest = 0
                 case .ANNUALLY:
-                    if currentMonthIndex == 11 {
+                    if monthOffset == 11 {
                         total += accruedInterest.rounded(2, .plain)
                         totalInterestEarned += accruedInterest
                         accruedInterest = 0
