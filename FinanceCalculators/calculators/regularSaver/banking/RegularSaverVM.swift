@@ -46,6 +46,14 @@ class RegularSaverVM: ObservableObject {
         state.graphPoints =  toPoint(balancePerYear: balancePerYear)
     }
     
+    /// Calculates the projected balance using banking-standard "Daily Accrual."
+    ///
+    /// Key Logic:
+    /// 1. Precision: Uses actual days in the month (e.g., Jan=31, Feb=28/29).
+    /// 2. Starts on the next month from current (e.g. if current month is Feb start in March). This avoids overcalculation when days in current month have already passed.
+    /// 3. Timing: Deposits are added at the START of the month (earning full interest).
+    /// 4. Rate: Uses a daily rate (Annual / 365) for maximum accuracy.
+    /// 5. Rounding: Interest is accrued precisely, then rounded (2dp) only when paid out (Monthly or Annually).
     private func calculateBalanceAdjustedStartDate() -> (balancesPerYear: [[Decimal]], interestEarned: Decimal) {
         let compoundFrequency = state.frequency
         let noYears = state.noYears
@@ -62,7 +70,7 @@ class RegularSaverVM: ObservableObject {
         var totalInterestEarned: Decimal = 0
         
         //Start on the next full month to avoid complext logic of adjusting for the partial current month
-        let nextMonthDate = Calendar.current.date(byAdding: .month, value: 1, to: Date())
+        let nextMonthDate = Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date()
         let startMonthIndex = Calendar.current.component(.month, from: nextMonthDate) - 1
         
         for year in 0..<noYears {

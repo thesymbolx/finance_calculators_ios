@@ -143,7 +143,7 @@ private struct CompundInterestCalculatorBodyView: View {
             AmountInputView(
                 amount: $input.annualInterest,
                 label: "Interest Rate",
-                prependSymbol: "£"
+                prependSymbol: "%"
             )
 
             NumberInputView(
