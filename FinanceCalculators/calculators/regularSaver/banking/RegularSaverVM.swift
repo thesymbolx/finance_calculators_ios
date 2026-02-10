@@ -14,7 +14,15 @@ extension Decimal {
 
 @Observable
 class RegularSaverVM: ObservableObject {
+    struct Limits {
+        let principal: Decimal = 100_000_000
+        let monthlyContribution: Decimal = 10_000
+        let noYears = 100
+        var annualInterest: Decimal = 30
+    }
+    
     struct ViewState {
+        var limits = Limits()
         var graphPoints: [Point] = []
         var balance: Decimal = 0
         var interestEarned: Decimal = 0

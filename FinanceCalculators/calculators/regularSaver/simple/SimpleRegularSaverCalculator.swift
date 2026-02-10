@@ -104,25 +104,45 @@ private struct CompundInterestCalculatorBodyView: View {
             AmountInputView(
                 amount: $input.principal,
                 label: "How much do you have now?",
-                prependSymbol: "£"
+                prependSymbol: "£",
+                onChanged: { old, new in
+                    if new > 99999999 {
+                        input.noYears = 99999999
+                    }
+                }
             )
 
             AmountInputView(
                 amount: $input.monthlyContribution,
                 label: "How much will you save each month?",
-                prependSymbol: "£"
+                prependSymbol: "£",
+                onChanged: { old, new in
+                    if new > 100000 {
+                        input.noYears = 100000
+                    }
+                }
             )
 
             AmountInputView(
                 amount: $input.annualInterest,
                 label: "Interest Rate",
-                prependSymbol: "£"
+                prependSymbol: "£",
+                onChanged: { old, new in
+                    if new > 30 {
+                        input.noYears = 30
+                    }
+                }
             )
 
             NumberInputView(
                 amount: $input.noYears,
                 label: "How long will you save for?",
-                prependSymbol: "Y"
+                prependSymbol: "Y",
+                onChanged: { old, new in
+                    if new > 100 {
+                        input.noYears = 100
+                    }
+                }
             )
             
             Button("Calculate", action: onCalculate)

@@ -4,6 +4,7 @@ struct NumberInputView: View {
     @Binding var amount: Int
     let label: String
     let prependSymbol: String
+    let onChanged: (Int, Int) -> Void
 
     var body: some View {
 
@@ -50,6 +51,9 @@ struct NumberInputView: View {
                             topTrailingRadius: 12
                         ).stroke(Color.gray.opacity(0.5), lineWidth: 2)
                     )
+                    .onChange(of: amount) { oldValue, newValue in
+                        onChanged(oldValue, newValue)
+                    }
             }
             .background(Color.white)
         }

@@ -1,15 +1,15 @@
-import SwiftUI
 import Charts
+import SwiftUI
 
 struct GrowthChart: View {
     let points: [Point]
-    
+
     var body: some View {
         Chart {
             if points.isEmpty {
                 RuleMark(y: .value("Y", 0)).foregroundStyle(.clear)
                 RuleMark(y: .value("Y", 1000)).foregroundStyle(.clear)
-                
+
                 RuleMark(x: .value("X", 0)).foregroundStyle(.clear)
                 RuleMark(x: .value("X", 10)).foregroundStyle(.clear)
             } else {
@@ -20,23 +20,29 @@ struct GrowthChart: View {
                     )
                     .foregroundStyle(Color(.primary))
                     .interpolationMethod(.catmullRom)
-                    
+
                     if points.count < 30 {
                         line.symbol(.circle)
                     } else {
                         line
                     }
                 }
-                
+
                 ForEach(points) { point in
                     AreaMark(
                         x: .value("Year", point.x),
-                        y: .value("Balance", Double(truncating: point.y as NSNumber))
+                        y: .value(
+                            "Balance",
+                            Double(truncating: point.y as NSNumber)
+                        )
                     )
                     .interpolationMethod(.monotone)
                     .foregroundStyle(
                         LinearGradient(
-                            colors: [Color(.primary).opacity(0.2), Color(.primary).opacity(0.0)],
+                            colors: [
+                                Color(.primary).opacity(0.2),
+                                Color(.primary).opacity(0.0),
+                            ],
                             startPoint: .top,
                             endPoint: .bottom
                         )
@@ -49,12 +55,29 @@ struct GrowthChart: View {
             domain: .automatic(includesZero: false),
             range: .plotDimension(startPadding: 10, endPadding: 0)
         )
+        .chartXAxis {
+            AxisMarks(values: .stride(by: 2)) { value in
+                AxisValueLabel()
+                AxisGridLine()
+            }
+        }
         .chartYScale(
             domain: .automatic(includesZero: false),
             range: .plotDimension(startPadding: 0, endPadding: 10)
         )
         .chartYAxis {
-            AxisMarks(format: .currency(code: "GBP").notation(.compactName))
+
+            AxisMarks() { value in
+                AxisValueLabel(
+                    format: .currency(code: "GBP").precision(.fractionLength(0))
+                )
+
+                if let doubleValue = value.as(Double.self), doubleValue == 0 {
+                    AxisGridLine(stroke: StrokeStyle(lineWidth: 1))
+                        .foregroundStyle(.gray.opacity(0.5))  // Optional: makes the 0 line subtle
+                }
+            }
+
         }
     }
 }

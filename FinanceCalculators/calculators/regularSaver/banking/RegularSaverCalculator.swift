@@ -28,7 +28,7 @@ struct RegularSaverCalculator: View {
                 .padding(.all)
 
                 CompundInterestCalculatorBodyView(
-                    input: $viewModel.state,
+                    state: $viewModel.state,
                     total: viewModel.state.balance,
                     onCalculate: {
                         viewModel.calculate()
@@ -43,7 +43,9 @@ struct RegularSaverCalculator: View {
             }
             .scrollTargetLayout()
         }
-        .background(.background)
+        .background(
+            Color(.primary).opacity(0.05)
+        )
         .coordinateSpace(name: scrollSpaceName)
         .scrollPosition(id: $scrollPosition)
         .navigationTitle("Banking Regular Saver")
@@ -62,12 +64,12 @@ private struct CalculatorHeader: View {
 
             if let start = state.startMonth, let end = state.endMonth {
                 Text("From \(start) to \(end)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.black)
             } else {
                 Text("Date range not set")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.black)
             }
             
             Text("£\(result)")
@@ -77,7 +79,7 @@ private struct CalculatorHeader: View {
             
             Text("Interest £\(interestEarned)")
                 .font(.subheadline.bold())
-                .foregroundStyle(.secondary)
+                .foregroundColor(.black.opacity(0.8))
             
             GrowthChart(points: state.graphPoints)
         }
@@ -85,7 +87,7 @@ private struct CalculatorHeader: View {
 }
 
 private struct CompundInterestCalculatorBodyView: View {
-    @Binding var input: RegularSaverVM.ViewState
+    @Binding var state: RegularSaverVM.ViewState
 
     let total: Decimal
     let onCalculate: () -> Void
@@ -131,27 +133,47 @@ private struct CompundInterestCalculatorBodyView: View {
             frequencyPicker
 
             AmountInputView(
-                amount: $input.principal,
+                amount: $state.principal,
                 label: "How much do you have now?",
-                prependSymbol: "£"
+                prependSymbol: "£",
+                onChanged: { old, new in
+                    if new > state.limits.principal {
+                        state.principal = state.limits.principal
+                    }
+                }
             )
 
             AmountInputView(
-                amount: $input.monthlyContribution,
+                amount: $state.monthlyContribution,
                 label: "How much will you save each month?",
-                prependSymbol: "£"
+                prependSymbol: "£",
+                onChanged: { old, new in
+                    if new > state.limits.monthlyContribution {
+                        state.monthlyContribution = state.limits.monthlyContribution
+                    }
+                }
             )
 
             AmountInputView(
-                amount: $input.annualInterest,
+                amount: $state.annualInterest,
                 label: "Interest Rate",
-                prependSymbol: "%"
+                prependSymbol: "%",
+                onChanged: { old, new in
+                    if new > state.limits.annualInterest {
+                        state.annualInterest = state.limits.annualInterest
+                    }
+                }
             )
 
             NumberInputView(
-                amount: $input.noYears,
+                amount: $state.noYears,
                 label: "How long will you save for?",
-                prependSymbol: "Y"
+                prependSymbol: "Y",
+                onChanged: { old, new in
+                    if new > state.limits.noYears {
+                        state.noYears = state.limits.noYears
+                    }
+                }
             )
 
             Button("Calculate", action: onCalculate)
@@ -173,7 +195,7 @@ private struct CompundInterestCalculatorBodyView: View {
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(Color.black.opacity(0.9))
 
-            Picker("Frequency", selection: $input.frequency) {
+            Picker("Frequency", selection: $state.frequency) {
                 Text("Monthly").tag(CompoundFrequency.MONTHLY)
                 Text("Annually").tag(CompoundFrequency.ANNUALLY)
             }

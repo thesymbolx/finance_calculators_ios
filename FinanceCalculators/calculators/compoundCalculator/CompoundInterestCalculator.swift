@@ -32,25 +32,29 @@ struct CompoundInterestCalculator: View {
                     AmountInputView(
                         amount: $principal,
                         label: "How much do you have now?",
-                        prependSymbol: "£"
+                        prependSymbol: "£",
+                        onChanged: { _, _ in }
                     )
 
                     AmountInputView(
                         amount: $monthlyContribution,
                         label: "How much will you save each month?",
-                        prependSymbol: "£"
+                        prependSymbol: "£",
+                        onChanged: { _, _ in }
                     )
 
                     AmountInputView(
                         amount: $annualInterest,
                         label: "Interest Rate",
-                        prependSymbol: "£"
+                        prependSymbol: "£",
+                        onChanged: { _, _ in }
                     )
                     
                     NumberInputView(
                         amount: $noYears,
                         label: "How long will you save for?",
-                        prependSymbol: "Y"
+                        prependSymbol: "Y",
+                        onChanged: { _, _ in }
                     )
 
                     Button("Calculate") {

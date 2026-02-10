@@ -4,6 +4,7 @@ struct AmountInputView: View {
     @Binding var amount: Decimal
     let label: String
     let prependSymbol: String
+    let onChanged: (Decimal, Decimal) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -50,6 +51,9 @@ struct AmountInputView: View {
                             topTrailingRadius: 12
                         ).stroke(Color.gray.opacity(0.5), lineWidth: 2)
                     )
+                    .onChange(of: amount) { oldValue, newValue in
+                        onChanged(oldValue, newValue)
+                    }
             }
             .background(Color.white)
         }
