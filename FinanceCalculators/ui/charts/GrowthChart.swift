@@ -69,7 +69,7 @@ struct GrowthChart: View {
 
             AxisMarks() { value in
                 AxisValueLabel(
-                    format: .currency(code: "GBP").precision(.fractionLength(0))
+                    format: .currency(code: "GBP").notation(.compactName)
                 )
 
                 if let doubleValue = value.as(Double.self), doubleValue == 0 {
