@@ -23,6 +23,8 @@ class RegularSaverVM: ObservableObject {
         var noYears: Int = 0
         var annualInterest: Decimal = 0
         var frequency: CompoundFrequency = .MONTHLY
+        var startMonth: String? = nil
+        var endMonth: String? = nil
     }
 
     var state = ViewState()
@@ -69,9 +71,19 @@ class RegularSaverVM: ObservableObject {
         var accruedInterest: Decimal = 0
         var totalInterestEarned: Decimal = 0
         
+        let currentDate = Date()
+        
+        
         //Start on the next full month to avoid complext logic of adjusting for the partial current month
-        let nextMonthDate = Calendar.current.date(byAdding: .month, value: 1, to: Date()) ?? Date()
-        let startMonthIndex = Calendar.current.component(.month, from: nextMonthDate) - 1
+        let startMonthDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
+        let startMonthIndex = Calendar.current.component(.month, from: startMonthDate) - 1
+        let endMonthDate = Calendar.current.date(byAdding: .month, value: 12 * noYears, to: currentDate) ?? currentDate
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMMM YYYY"
+        
+        state.startMonth = dateFormatter.string(from: startMonthDate)
+        state.endMonth = dateFormatter.string(from: endMonthDate)
         
         for year in 0..<noYears {
             var balancePerMonth: [Decimal] = []
@@ -90,9 +102,7 @@ class RegularSaverVM: ObservableObject {
                 let interestForMonth =
                     (total * dailyInterestRate) * Decimal(daysInCurrentMonth)
                 accruedInterest += interestForMonth
-                
-                print(accruedInterest)
-                
+                                
                 switch compoundFrequency {
                 case .MONTHLY:
                     total += accruedInterest.rounded(2, .plain)

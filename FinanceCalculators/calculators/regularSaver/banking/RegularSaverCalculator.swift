@@ -60,15 +60,17 @@ private struct CalculatorHeader: View {
             let result = state.balance.formatted(.number.precision(.fractionLength(2)))
             let interestEarned = state.interestEarned.formatted(.number.precision(.fractionLength(2)))
 
-            let balanceText = Text("\(result)")
-                .foregroundColor(Color(.primary))
-                .bold()
+            if let start = state.startMonth, let end = state.endMonth {
+                Text("From \(start) to \(end)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("Date range not set")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
             
-            Text("By January of 2023")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            
-            Text("£\(balanceText)")
+            Text("£\(result)")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundColor(Color(.primary))
