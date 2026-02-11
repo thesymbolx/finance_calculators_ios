@@ -50,7 +50,16 @@ class RegularSaverVM: ObservableObject {
     func calculate() {
         let (balancePerYear, interestEarned) = calculateBalanceAdjustedStartDate()
         let endingBalance = balancePerYear.last!.last!
-    
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMMM yyyy"
+        
+        let currentDate = Date()
+        let startMonthDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
+        let endMonthDate = Calendar.current.date(byAdding: .month, value: 12 * state.noYears, to: currentDate) ?? currentDate
+        
+        state.startMonth = dateFormatter.string(from: startMonthDate)
+        state.endMonth = dateFormatter.string(from: endMonthDate)
         state.balance = endingBalance
         state.interestEarned = interestEarned
         state.graphPoints =  toPoint(balancePerYear: balancePerYear)
@@ -73,36 +82,26 @@ class RegularSaverVM: ObservableObject {
 
         var balancePerYear: [[Decimal]] = []
         var daysInMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        let dailyInterestRate = (annualInterest / 100) / 365
 
         var total = principal
         var accruedInterest: Decimal = 0
         var totalInterestEarned: Decimal = 0
         
-        let currentDate = Date()
         //Start on the next full month to avoid complext logic of adjusting for the partial current month
+        let currentDate = Date()
         let startMonthDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
         let startMonthIndex = Calendar.current.component(.month, from: startMonthDate) - 1
-        let endMonthDate = Calendar.current.date(byAdding: .month, value: 12 * noYears, to: currentDate) ?? currentDate
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMMM YYYY"
-        
-        state.startMonth = dateFormatter.string(from: startMonthDate)
-        state.endMonth = dateFormatter.string(from: endMonthDate)
-        
-        for year in 0..<noYears {
-            let daysInYear: Decimal = isLeapYear(year: year) ? 366 : 365
-            let dailyInterestRate = (annualInterest / 100) / daysInYear
-
+        for yearCount in 0..<noYears {
             var balancePerMonth: [Decimal] = []
-
-            let yearOffset = startMonthIndex > 1 ? 1 : 0
-            daysInMonths[1] = getDaysInFeb(currentYear: year + yearOffset)
             
-            for monthOffset in 0..<12 {
+            daysInMonths[1] = getDaysInFeb(yearCount: yearCount, startMonth: startMonthIndex, currentDate: currentDate)
+            
+            for monthCount in 0..<12 {
                 // Determine if Feb falls in the Current Year or Next Year
                 // If we start in March (Index 2) or later, the next Feb is next year.
-                let currentMonthIndex = (startMonthIndex + monthOffset) % 12
+                let currentMonthIndex = (startMonthIndex + monthCount) % 12
                 let daysInCurrentMonth = daysInMonths[currentMonthIndex]
                 
                 total += monthlyContribution
@@ -111,7 +110,7 @@ class RegularSaverVM: ObservableObject {
                     (total * dailyInterestRate) * Decimal(daysInCurrentMonth)
                 accruedInterest += interestForMonth
                 
-                print("Month: \(monthOffset) Monthly Interest: \(accruedInterest) Total Interest \((totalInterestEarned + accruedInterest).rounded(2, .plain))")
+                print("Month: \(monthCount), Monthly Interest: \(accruedInterest), Total Interest \((totalInterestEarned + accruedInterest).rounded(2, .plain)), Total \(total)")
                                 
                 switch compoundFrequency {
                 case .MONTHLY:
@@ -119,7 +118,7 @@ class RegularSaverVM: ObservableObject {
                     totalInterestEarned += accruedInterest
                     accruedInterest = 0
                 case .ANNUALLY:
-                    if monthOffset == 11 {
+                    if monthCount == 11 {
                         total += accruedInterest.rounded(2, .plain)
                         totalInterestEarned += accruedInterest
                         accruedInterest = 0
@@ -134,23 +133,20 @@ class RegularSaverVM: ObservableObject {
 
         return (balancePerYear, totalInterestEarned.rounded(2, .plain))
     }
-
-    private func getDaysInFeb(currentYear: Int) -> Int {
-        let currentYear =
-            Calendar
-            .current
-            .component(.year, from: Date())
-            .advanced(by: currentYear)
-
-        let isLeapYear = isLeapYear(year: currentYear)
-
+    
+    private func getDaysInFeb(yearCount: Int, startMonth: Int, currentDate: Date) -> Int {
+        //If start month after feb, feb is in next year so offset to next year.
+        let yearOffset = startMonth > 1 ? 1 : 0
+        
+        //Get current year, unless feb is in next year, in which case get next year.
+        let dateYearAdjusted = Calendar.current.date(byAdding: .year, value: yearCount + yearOffset, to: currentDate) ?? currentDate
+        let adjustedYear = Calendar.current.component(.year, from: dateYearAdjusted)
+        
+        let isLeapYear = adjustedYear.isMultiple(of: 4) && (!adjustedYear.isMultiple(of: 100) || adjustedYear.isMultiple(of: 400))
+        
         return isLeapYear ? 29 : 28
     }
     
-    private func isLeapYear(year: Int) -> Bool {
-        return year.isMultiple(of: 4) && (!year.isMultiple(of: 100) || year.isMultiple(of: 400))
-    }
-
     private func toPoint(balancePerYear: [[Decimal]]) -> [Point] {
         var points: [Point] = []
 
