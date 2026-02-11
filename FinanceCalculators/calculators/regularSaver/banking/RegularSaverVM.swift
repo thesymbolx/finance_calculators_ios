@@ -20,7 +20,7 @@ class RegularSaverVM: ObservableObject {
         let noYears = 100
         var annualInterest: Decimal = 30
     }
-    
+
     struct ViewState {
         var limits = Limits()
         var graphPoints: [Point] = []
@@ -43,28 +43,33 @@ class RegularSaverVM: ObservableObject {
         let isInterestValid = !state.annualInterest.isNaN
         let isYearsValid = state.noYears > 0
 
-        return isPrincipalValid && isContributionValid && isInterestValid
-            && isYearsValid
+        return isPrincipalValid && isContributionValid && isInterestValid && isYearsValid
     }
 
     func calculate() {
-        let (balancePerYear, interestEarned) = calculateBalanceAdjustedStartDate()
+        let (balancePerYear, interestEarned) =
+            calculateBalanceAdjustedStartDate()
         let endingBalance = balancePerYear.last!.last!
-        
+
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMMM yyyy"
-        
+
         let currentDate = Date()
         let startMonthDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
-        let endMonthDate = Calendar.current.date(byAdding: .month, value: 12 * state.noYears, to: currentDate) ?? currentDate
-        
+        let endMonthDate =
+            Calendar.current.date(
+                byAdding: .month,
+                value: 12 * state.noYears,
+                to: currentDate
+            ) ?? currentDate
+
         state.startMonth = dateFormatter.string(from: startMonthDate)
         state.endMonth = dateFormatter.string(from: endMonthDate)
         state.balance = endingBalance
         state.interestEarned = interestEarned
-        state.graphPoints =  toPoint(balancePerYear: balancePerYear)
+        state.graphPoints = toPoint(balancePerYear: balancePerYear)
     }
-    
+
     /// Calculates the projected balance using banking-standard "Daily Accrual."
     ///
     /// Key Logic:
@@ -73,7 +78,9 @@ class RegularSaverVM: ObservableObject {
     /// 3. Timing: Deposits are added at the START of the month (earning full interest).
     /// 4. Rate: Uses a daily rate (Annual / 365) for maximum accuracy.
     /// 5. Rounding: Interest is accrued precisely, then rounded (2dp) only when paid out (Monthly or Annually).
-    private func calculateBalanceAdjustedStartDate() -> (balancesPerYear: [[Decimal]], interestEarned: Decimal) {
+    private func calculateBalanceAdjustedStartDate() -> (
+        balancesPerYear: [[Decimal]], interestEarned: Decimal
+    ) {
         let compoundFrequency = state.frequency
         let noYears = state.noYears
         let principal = state.principal
@@ -87,31 +94,32 @@ class RegularSaverVM: ObservableObject {
         var total = principal
         var accruedInterest: Decimal = 0
         var totalInterestEarned: Decimal = 0
-        
+
         //Start on the next full month to avoid complext logic of adjusting for the partial current month
         let currentDate = Date()
         let startMonthDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
         let startMonthIndex = Calendar.current.component(.month, from: startMonthDate) - 1
-        
+
         for yearCount in 0..<noYears {
             var balancePerMonth: [Decimal] = []
-            
-            daysInMonths[1] = getDaysInFeb(yearCount: yearCount, startMonth: startMonthIndex, currentDate: currentDate)
-            
+
+            daysInMonths[1] = getDaysInFeb(
+                yearCount: yearCount,
+                startMonth: startMonthIndex,
+                currentDate: currentDate
+            )
+
             for monthCount in 0..<12 {
                 // Determine if Feb falls in the Current Year or Next Year
                 // If we start in March (Index 2) or later, the next Feb is next year.
                 let currentMonthIndex = (startMonthIndex + monthCount) % 12
                 let daysInCurrentMonth = daysInMonths[currentMonthIndex]
-                
+
                 total += monthlyContribution
 
-                let interestForMonth =
-                    (total * dailyInterestRate) * Decimal(daysInCurrentMonth)
+                let interestForMonth = (total * dailyInterestRate) * Decimal(daysInCurrentMonth)
                 accruedInterest += interestForMonth
-                
-                print("Month: \(monthCount), Monthly Interest: \(accruedInterest), Total Interest \((totalInterestEarned + accruedInterest).rounded(2, .plain)), Total \(total)")
-                                
+
                 switch compoundFrequency {
                 case .MONTHLY:
                     total += accruedInterest.rounded(2, .plain)
@@ -133,20 +141,35 @@ class RegularSaverVM: ObservableObject {
 
         return (balancePerYear, totalInterestEarned.rounded(2, .plain))
     }
-    
-    private func getDaysInFeb(yearCount: Int, startMonth: Int, currentDate: Date) -> Int {
+
+    private func getDaysInFeb(
+        yearCount: Int,
+        startMonth: Int,
+        currentDate: Date
+    ) -> Int {
         //If start month after feb, feb is in next year so offset to next year.
         let yearOffset = startMonth > 1 ? 1 : 0
-        
+
         //Get current year, unless feb is in next year, in which case get next year.
-        let dateYearAdjusted = Calendar.current.date(byAdding: .year, value: yearCount + yearOffset, to: currentDate) ?? currentDate
-        let adjustedYear = Calendar.current.component(.year, from: dateYearAdjusted)
-        
-        let isLeapYear = adjustedYear.isMultiple(of: 4) && (!adjustedYear.isMultiple(of: 100) || adjustedYear.isMultiple(of: 400))
-        
+        let dateYearAdjusted =
+            Calendar.current.date(
+                byAdding: .year,
+                value: yearCount + yearOffset,
+                to: currentDate
+            ) ?? currentDate
+        let adjustedYear = Calendar.current.component(
+            .year,
+            from: dateYearAdjusted
+        )
+
+        let isLeapYear =
+            adjustedYear.isMultiple(of: 4)
+            && (!adjustedYear.isMultiple(of: 100)
+                || adjustedYear.isMultiple(of: 400))
+
         return isLeapYear ? 29 : 28
     }
-    
+
     private func toPoint(balancePerYear: [[Decimal]]) -> [Point] {
         var points: [Point] = []
 
