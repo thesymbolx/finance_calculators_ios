@@ -196,8 +196,15 @@ private struct CompundInterestCalculatorBodyView: View {
                 .foregroundStyle(Color.black.opacity(0.9))
 
             Picker("Frequency", selection: $state.frequency) {
-                Text("Monthly").tag(CompoundFrequency.MONTHLY)
-                Text("Annually").tag(CompoundFrequency.ANNUALLY)
+                Text("Monthly")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.black)
+                    .tag(CompoundFrequency.MONTHLY)
+                
+                Text("Annually")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.black)
+                    .tag(CompoundFrequency.ANNUALLY)
             }
             .pickerStyle(.segmented)
         }
