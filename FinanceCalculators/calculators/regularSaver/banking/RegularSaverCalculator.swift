@@ -43,6 +43,7 @@ struct RegularSaverCalculator: View {
             }
             .scrollTargetLayout()
         }
+        .ignoresSafeArea(edges: .bottom)
         .background(
             Color(.primary).opacity(0.05)
         )
@@ -186,7 +187,9 @@ private struct CompundInterestCalculatorBodyView: View {
                 .disabled(!isButtonEnabled)
 
         }
-        .padding(.all)
+        .padding(.horizontal)
+        .padding(.top)
+        .padding(.bottom, 30)
     }
 
     var frequencyPicker: some View {
