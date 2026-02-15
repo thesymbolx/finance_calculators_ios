@@ -43,10 +43,16 @@ struct RegularSaverCalculator: View {
             }
             .scrollTargetLayout()
         }
-        .ignoresSafeArea(edges: .bottom)
         .background(
-            Color(.primary).opacity(0.05)
+            //Make bottom white so you cannot see green below the card when scrolling.
+            VStack(spacing: 0) {
+                Color(.primary).opacity(0.05)
+                    .frame(height: 500)
+                Color.white
+            }
+            .ignoresSafeArea()
         )
+        .ignoresSafeArea(edges: .bottom)
         .coordinateSpace(name: scrollSpaceName)
         .scrollPosition(id: $scrollPosition)
         .navigationTitle("Banking Regular Saver")
