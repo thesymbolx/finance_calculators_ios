@@ -46,7 +46,8 @@ struct RegularSaverCalculator: View {
         .background(
             //Make bottom white so you cannot see green below the card when scrolling.
             VStack(spacing: 0) {
-                Color(.primary).opacity(0.05)
+                Color(.primary)
+                    .opacity(0.05)
                     .frame(height: 500)
                 Color.white
             }
@@ -216,6 +217,7 @@ private struct CompundInterestCalculatorBodyView: View {
                     .tag(CompoundFrequency.ANNUALLY)
             }
             .pickerStyle(.segmented)
+            .onChange(of: state.frequency, onCalculate) 
         }
     }
 }
