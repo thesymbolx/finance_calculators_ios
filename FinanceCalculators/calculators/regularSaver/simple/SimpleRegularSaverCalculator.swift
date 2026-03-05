@@ -106,8 +106,10 @@ private struct CompundInterestCalculatorBodyView: View {
                 label: "How much do you have now?",
                 prependSymbol: "£",
                 onChanged: { old, new in
-                    if new > 99999999 {
-                        input.noYears = 99999999
+                    if let new = new {
+                        if new > 99999999 {
+                            input.noYears = 99999999
+                        }
                     }
                 }
             )
@@ -117,8 +119,10 @@ private struct CompundInterestCalculatorBodyView: View {
                 label: "How much will you save each month?",
                 prependSymbol: "£",
                 onChanged: { old, new in
-                    if new > 100000 {
-                        input.noYears = 100000
+                    if let new = new {
+                        if new > 100000 {
+                            input.noYears = 100000
+                        }
                     }
                 }
             )
@@ -128,8 +132,10 @@ private struct CompundInterestCalculatorBodyView: View {
                 label: "Interest Rate",
                 prependSymbol: "£",
                 onChanged: { old, new in
-                    if new > 30 {
-                        input.noYears = 30
+                    if let new = new {
+                        if new > 30 {
+                            input.noYears = 30
+                        }
                     }
                 }
             )
@@ -139,8 +145,10 @@ private struct CompundInterestCalculatorBodyView: View {
                 label: "How long will you save for?",
                 prependSymbol: "Y",
                 onChanged: { old, new in
-                    if new > 100 {
-                        input.noYears = 100
+                    if let new = new {
+                        if new > 100 {
+                            input.noYears = 100
+                        }
                     }
                 }
             )

@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct AmountInputView: View {
-    @Binding var amount: Decimal
+    @Binding var amount: Decimal?
     let label: String
     let prependSymbol: String
-    let onChanged: (Decimal, Decimal) -> Void
+    let onChanged: (Decimal?, Decimal?) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -35,7 +35,6 @@ struct AmountInputView: View {
                         )
                         .stroke(Color(.primary), lineWidth: 2)
                     )
-                
                 
                 TextField("", value: $amount, format: .currency(code: ""))
                     .keyboardType(.decimalPad)

@@ -11,10 +11,10 @@ class SimpleRegularSaverVM: ObservableObject {
     }
 
     struct CalculatorInput: Equatable {
-        var principal: Decimal = 0
-        var monthlyContribution: Decimal = 0
-        var noYears: Int = 0
-        var annualInterest: Decimal = 0
+        var principal: Decimal? = nil
+        var monthlyContribution: Decimal? = nil
+        var noYears: Int? = nil
+        var annualInterest: Decimal? = nil
         var frequency: CompoundFrequency = .MONTHLY
     }
 
@@ -25,13 +25,14 @@ class SimpleRegularSaverVM: ObservableObject {
     )
 
     var isFormValid: Bool {
-        let isPrincipalValid = !calculatorInput.principal.isNaN
-        let isContributionValid = !calculatorInput.monthlyContribution.isNaN
-        let isInterestValid = !calculatorInput.annualInterest.isNaN
-        let isYearsValid = calculatorInput.noYears > 0
-
-        return isPrincipalValid && isContributionValid && isInterestValid
-            && isYearsValid
+        if let principal = calculatorInput.principal,
+           let monthlyContribution = calculatorInput.monthlyContribution,
+           let annualInterest = calculatorInput.annualInterest,
+           let noYears = calculatorInput.noYears {
+            return !principal.isNaN && !monthlyContribution.isNaN && !annualInterest.isNaN && noYears > 0
+        } else {
+            return false
+        }
     }
 
     func calculate() {
@@ -51,12 +52,15 @@ class SimpleRegularSaverVM: ObservableObject {
     /// 2. Rate: Treats input as Gross (Rate/12). This allows Monthly Payouts to correctly outperform Annual Payouts.
     /// 3. Payouts: 'Monthly' compounds immediately (exponential curve), while 'Annually' holds interest in a pot (stepped line).
     private func calculateBalance() -> [[Decimal]] {
-        let noYears = calculatorInput.noYears
-        let monthlyContribution = calculatorInput.monthlyContribution
-        let annualInterest = calculatorInput.annualInterest
-        let principal = calculatorInput.principal
+        guard let noYears = calculatorInput.noYears,
+                let monthlyContribution = calculatorInput.monthlyContribution,
+                let annualInterest = calculatorInput.annualInterest,
+                let principal = calculatorInput.principal
+        else {
+            return []
+        }
+        
         let interestPaidFrequency = calculatorInput.frequency
-
         let monthlyRate = (annualInterest / 100) / 12
 
         var balance = principal

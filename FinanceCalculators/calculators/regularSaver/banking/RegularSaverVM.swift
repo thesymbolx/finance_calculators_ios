@@ -25,11 +25,11 @@ class RegularSaverVM: ObservableObject {
         var limits = Limits()
         var graphPoints: [Point] = []
         var balance: Decimal = 0
-        var interestEarned: Decimal = 0
-        var principal: Decimal = 0
-        var monthlyContribution: Decimal = 0
-        var noYears: Int = 0
-        var annualInterest: Decimal = 0
+        var interestEarned: Decimal? = nil
+        var principal: Decimal? = nil
+        var monthlyContribution: Decimal? = nil
+        var noYears: Int? = nil
+        var annualInterest: Decimal? = nil
         var frequency: CompoundFrequency = .MONTHLY
         var startMonth: String? = nil
         var endMonth: String? = nil
@@ -38,15 +38,26 @@ class RegularSaverVM: ObservableObject {
     var state = ViewState()
 
     var isFormValid: Bool {
-        let isPrincipalValid = !state.principal.isNaN
-        let isContributionValid = !state.monthlyContribution.isNaN
-        let isInterestValid = !state.annualInterest.isNaN
-        let isYearsValid = state.noYears > 0
+        guard let principal = state.principal,
+            let contribution = state.monthlyContribution,
+            let interest = state.annualInterest,
+            let noYears = state.noYears
+        else {
+            return false
+        }
 
-        return isPrincipalValid && isContributionValid && isInterestValid && isYearsValid
+        let isYearsValid = noYears > 0
+        let isPrincipalValid = principal >= 0
+        let isContributionValid = contribution >= 0
+        let isInterestValid = interest >= 0
+
+        return isYearsValid && isPrincipalValid && isContributionValid
+            && isInterestValid
     }
 
     func calculate() {
+        guard let noYears = state.noYears else { return }
+        
         let (balancePerYear, interestEarned) =
             calculateBalanceAdjustedStartDate()
         let endingBalance = balancePerYear.last!.last!
@@ -55,11 +66,13 @@ class RegularSaverVM: ObservableObject {
         dateFormatter.dateFormat = "MMMM yyyy"
 
         let currentDate = Date()
-        let startMonthDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
+        let startMonthDate =
+            Calendar.current.date(byAdding: .month, value: 1, to: currentDate)
+            ?? currentDate
         let endMonthDate =
             Calendar.current.date(
                 byAdding: .month,
-                value: 12 * state.noYears,
+                value: 12 * noYears,
                 to: currentDate
             ) ?? currentDate
 
@@ -82,10 +95,10 @@ class RegularSaverVM: ObservableObject {
         balancesPerYear: [[Decimal]], interestEarned: Decimal
     ) {
         let compoundFrequency = state.frequency
-        let noYears = state.noYears
-        let principal = state.principal
-        let annualInterest = state.annualInterest
-        let monthlyContribution = state.monthlyContribution
+        let noYears = state.noYears ?? 0
+        let principal = state.principal ?? 0
+        let annualInterest = state.annualInterest ?? 0
+        let monthlyContribution = state.monthlyContribution ?? 0
 
         var balancePerYear: [[Decimal]] = []
         var daysInMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -97,8 +110,11 @@ class RegularSaverVM: ObservableObject {
 
         //Start on the next full month to avoid complext logic of adjusting for the partial current month
         let currentDate = Date()
-        let startMonthDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
-        let startMonthIndex = Calendar.current.component(.month, from: startMonthDate) - 1
+        let startMonthDate =
+            Calendar.current.date(byAdding: .month, value: 1, to: currentDate)
+            ?? currentDate
+        let startMonthIndex =
+            Calendar.current.component(.month, from: startMonthDate) - 1
 
         for yearCount in 0..<noYears {
             var balancePerMonth: [Decimal] = []
@@ -117,7 +133,8 @@ class RegularSaverVM: ObservableObject {
 
                 total += monthlyContribution
 
-                let interestForMonth = (total * dailyInterestRate) * Decimal(daysInCurrentMonth)
+                let interestForMonth =
+                    (total * dailyInterestRate) * Decimal(daysInCurrentMonth)
                 accruedInterest += interestForMonth
 
                 switch compoundFrequency {

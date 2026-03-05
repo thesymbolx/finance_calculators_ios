@@ -68,7 +68,7 @@ private struct CalculatorHeader: View {
             Spacer()
             
             let result = state.balance.formatted(.number.precision(.fractionLength(2)))
-            let interestEarned = state.interestEarned.formatted(.number.precision(.fractionLength(2)))
+            let interestEarned = (state.interestEarned ?? 0).formatted(.number.precision(.fractionLength(2)))
 
             if let start = state.startMonth, let end = state.endMonth {
                 Text("From \(start) to \(end)")
@@ -145,7 +145,7 @@ private struct CompundInterestCalculatorBodyView: View {
                 label: "How much do you have now?",
                 prependSymbol: "£",
                 onChanged: { old, new in
-                    if new > state.limits.principal {
+                    if let newValue = new, newValue > state.limits.principal {
                         state.principal = state.limits.principal
                     }
                 }
@@ -156,7 +156,7 @@ private struct CompundInterestCalculatorBodyView: View {
                 label: "How much will you save each month?",
                 prependSymbol: "£",
                 onChanged: { old, new in
-                    if new > state.limits.monthlyContribution {
+                    if let newValue = new, newValue > state.limits.monthlyContribution {
                         state.monthlyContribution = state.limits.monthlyContribution
                     }
                 }
@@ -167,7 +167,7 @@ private struct CompundInterestCalculatorBodyView: View {
                 label: "Interest Rate",
                 prependSymbol: "%",
                 onChanged: { old, new in
-                    if new > state.limits.annualInterest {
+                    if let newValue = new, newValue > state.limits.annualInterest {
                         state.annualInterest = state.limits.annualInterest
                     }
                 }
@@ -178,7 +178,7 @@ private struct CompundInterestCalculatorBodyView: View {
                 label: "How long will you save for?",
                 prependSymbol: "Y",
                 onChanged: { old, new in
-                    if new > state.limits.noYears {
+                    if let newValue = new, newValue > state.limits.noYears {
                         state.noYears = state.limits.noYears
                     }
                 }

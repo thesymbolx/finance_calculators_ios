@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct NumberInputView: View {
-    @Binding var amount: Int
+    @Binding var amount: Int?
     let label: String
     let prependSymbol: String
-    let onChanged: (Int, Int) -> Void
+    let onChanged: (Int?, Int?) -> Void
 
     var body: some View {
 

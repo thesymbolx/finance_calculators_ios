@@ -8,10 +8,10 @@ fileprivate enum Frequency: Int, CaseIterable {
 }
 
 struct CompoundInterestCalculator: View {
-    @State var principal: Decimal = 0
-    @State var monthlyContribution: Decimal = 0
-    @State var noYears: Int = 0
-    @State var annualInterest: Decimal = 0
+    @State var principal: Decimal? = nil
+    @State var monthlyContribution: Decimal? = nil
+    @State var noYears: Int? = nil
+    @State var annualInterest: Decimal? = nil
     @State var result: String = "£0.00"
     @State fileprivate var selectedFrequency: Frequency = Frequency.yearly
 
@@ -58,19 +58,25 @@ struct CompoundInterestCalculator: View {
                     )
 
                     Button("Calculate") {
-                        let localResult = compoundInterestWithContribution2(
-                            principal: principal,
-                            annualInterest: annualInterest,
-                            noYears: noYears,
-                            compoundFrequency: selectedFrequency.rawValue,
-                            monthlyContribution: monthlyContribution
-                        )
-                        
-                        let formattedResult = localResult.formatted(
-                            .number.precision(.fractionLength(2))
-                        )
+                        if let principal = principal,
+                            let annualInterest = annualInterest,
+                            let noYears = noYears,
+                            let monthlyContribution = monthlyContribution
+                        {
+                            let localResult = compoundInterestWithContribution2(
+                                principal: principal,
+                                annualInterest: annualInterest,
+                                noYears: noYears,
+                                compoundFrequency: selectedFrequency.rawValue,
+                                monthlyContribution: monthlyContribution
+                            )
 
-                        result = "£\(formattedResult)"
+                            let formattedResult = localResult.formatted(
+                                .number.precision(.fractionLength(2))
+                            )
+
+                            result = "£\(formattedResult)"
+                        }
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
