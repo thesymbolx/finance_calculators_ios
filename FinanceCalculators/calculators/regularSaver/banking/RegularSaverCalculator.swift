@@ -197,8 +197,8 @@ private struct CompundInterestCalculatorBodyView: View {
 
     var frequencyPicker: some View {
         VStack(alignment: .leading) {
-            Text("Interest Paid")
-                .font(.system(size: 15, weight: .semibold))
+            Text("Interest paid")
+                .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(Color.black.opacity(0.9))
 
             Picker("Frequency", selection: $state.frequency) {
