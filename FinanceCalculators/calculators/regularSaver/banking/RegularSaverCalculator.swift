@@ -44,14 +44,10 @@ struct RegularSaverCalculator: View {
             .scrollTargetLayout()
         }
         .background(
-            //Make bottom white so you cannot see green below the card when scrolling.
-            VStack(spacing: 0) {
-                Color(.primary)
-                    .opacity(0.05)
-                    .frame(height: 500)
-                Color.white
-            }
-            .ignoresSafeArea()
+            LinearGradient(stops: [
+                Gradient.Stop(color: Color(.primary).opacity(0.05), location: 0.60),
+                Gradient.Stop(color: .white, location: 0.80),
+            ], startPoint: .top, endPoint: .bottom)
         )
         .ignoresSafeArea(edges: .bottom)
         .coordinateSpace(name: scrollSpaceName)

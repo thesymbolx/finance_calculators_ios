@@ -3,6 +3,8 @@ import SwiftUI
 
 struct GrowthChart: View {
     let points: [Point]
+    
+    private let xScaleDomainMax = 10.0
 
     var body: some View {
         Chart {
@@ -11,7 +13,7 @@ struct GrowthChart: View {
                 RuleMark(y: .value("Y", 1000)).foregroundStyle(.clear)
 
                 RuleMark(x: .value("X", 0)).foregroundStyle(.clear)
-                RuleMark(x: .value("X", 10)).foregroundStyle(.clear)
+                RuleMark(x: .value("X", xScaleDomainMax)).foregroundStyle(.clear)
             } else {
                 ForEach(points) { point in
                     let line = LineMark(
@@ -52,22 +54,16 @@ struct GrowthChart: View {
         }
         .frame(height: 250)
         .chartXScale(
-            domain: .automatic(includesZero: false),
-            range: .plotDimension(startPadding: 10, endPadding: 0)
+            domain: points.isEmpty ? 0...xScaleDomainMax : 0...(points.last?.x ?? xScaleDomainMax),
+            range: .plotDimension(startPadding: 5, endPadding: 5)
         )
-        .chartXAxis {
-            AxisMarks(values: .stride(by: 2)) { value in
-                AxisValueLabel()
-                AxisGridLine()
-            }
-        }
         .chartYScale(
             domain: .automatic(includesZero: false),
             range: .plotDimension(startPadding: 0, endPadding: 10)
         )
         .chartYAxis {
 
-            AxisMarks() { value in
+            AxisMarks { value in
                 AxisValueLabel(
                     format: .currency(code: "GBP").notation(.compactName)
                 )
