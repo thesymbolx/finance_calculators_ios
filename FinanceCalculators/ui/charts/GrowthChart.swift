@@ -57,8 +57,8 @@ struct GrowthChart: View {
         .onChange(of: points) { oldValue, newValue in
             revealProgress = 0.0
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                withAnimation(.easeInOut(duration: 5.0)) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                withAnimation(.easeInOut(duration: 0.7)) {
                     revealProgress = 1.0
                 }
             }
@@ -69,7 +69,7 @@ struct GrowthChart: View {
         )
         .chartYScale(
             domain: .automatic(includesZero: false),
-            range: .plotDimension(startPadding: 0, endPadding: 5)
+            range: .plotDimension(startPadding: 5, endPadding: 5)
         )
         .chartYAxis {
             AxisMarks { value in
