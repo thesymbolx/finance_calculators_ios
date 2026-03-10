@@ -5,6 +5,9 @@ struct GrowthChart: View {
     let points: [Point]
     
     private let xScaleDomainMax = 10.0
+    
+    // 1. State to track the left-to-right reveal (0.0 = hidden, 1.0 = fully visible)
+    @State private var revealProgress: CGFloat = 1.0
 
     var body: some View {
         Chart {
@@ -62,7 +65,6 @@ struct GrowthChart: View {
             range: .plotDimension(startPadding: 0, endPadding: 10)
         )
         .chartYAxis {
-
             AxisMarks { value in
                 AxisValueLabel(
                     format: .currency(code: "GBP").notation(.compactName)
@@ -70,10 +72,31 @@ struct GrowthChart: View {
 
                 if let doubleValue = value.as(Double.self), doubleValue == 0 {
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 1))
-                        .foregroundStyle(.gray.opacity(0.5))  // Optional: makes the 0 line subtle
+                        .foregroundStyle(.gray.opacity(0.5))
                 }
             }
-
+        }
+        // 2. Apply the sweeping mask to the plot area
+        .chartPlotStyle { plotArea in
+            plotArea
+                .mask(alignment: .leading) {
+                    Rectangle()
+                        // This scales the rectangle from 0 width to full width
+                        .scaleEffect(x: revealProgress, anchor: .leading)
+                }
+        }
+        // 3. Sequence the delay and animation (iOS 17+ syntax)
+        .onChange(of: points) { oldValue, newValue in
+            // Instantly hide the line by collapsing the mask to the left
+            revealProgress = 0.0
+            
+            // Wait 0.5 seconds for the axes to settle
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                // A linear or easeInOut animation usually looks best for a drawing effect
+                withAnimation(.easeInOut(duration: 1.0)) {
+                    revealProgress = 1.0
+                }
+            }
         }
     }
 }
