@@ -1,18 +1,13 @@
 import SwiftUI
 
 struct ContentView: View {
-    let blueColor = Color(red: 0xE3 / 255, green: 0xF2 / 255, blue: 0xFD / 255)
+    let blueColor = Color(red: 0.83, green: 0.24, blue: 0.27)
     let greenColor = Color(red: 0.13, green: 0.61, blue: 0.35)
-    let roseColor = Color(red: 0xFD / 255, green: 0xEA / 255, blue: 0xEA / 255)
+    let roseColor = Color(red: 0.83, green: 0.24, blue: 0.27)
 
     var body: some View {
         NavigationView {
             ZStack {
-                
-                
-                
-         
-
                 List {
                     ZStack {
                         CalculatorCardView(
@@ -20,10 +15,9 @@ struct ContentView: View {
                             description: "Growth for regular deposits",
                             iconName: "piggybank",
                             backgroundColor: greenColor,
-                            foregroundColor: .white,
-                            isSystemImage: false // Uses your custom SVG from Assets
+                            isSystemImage: false
                         )
-                        
+
                         NavigationLink(destination: RegularSaverCalculator()) {
                             EmptyView()
                         }
@@ -31,48 +25,49 @@ struct ContentView: View {
                     }
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
-                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                    
+                    .listRowInsets(
+                        EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
+                    )
+
                     ZStack {
                         CalculatorCardView(
                             title: "Saving Goal",
                             description: "How long to reach a sum",
-                            iconName: "sparkles",
+                            iconName: "growth",
                             backgroundColor: blueColor,
-                            foregroundColor: .primary,
-                            isSystemImage: true
+                            isSystemImage: false
                         )
-                        
-                        NavigationLink(destination: CompoundInterestCalculator()) {
+
+                        NavigationLink(
+                            destination: CompoundInterestCalculator()
+                        ) {
                             EmptyView()
                         }
                         .opacity(0)
                     }
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
-                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                   
+                    .listRowInsets(
+                        EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
+                    )
+
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
             }
             .navigationTitle("Calculators")
-            .background(
-                .background
-            )
+            .background(.background)
         }
     }
 }
-
 
 struct CalculatorCardView: View {
     let title: String
     let description: String
     let iconName: String
     let backgroundColor: Color
-    let foregroundColor: Color
-    var isSystemImage: Bool = false // Added this so you can mix SVGs and SF Symbols!
-    
+    let isSystemImage: Bool
+
     var body: some View {
         HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 6) {
@@ -82,32 +77,32 @@ struct CalculatorCardView: View {
 
                 Text(description)
                     .font(.system(size: 14, weight: .regular))
-                    .opacity(foregroundColor == .white ? 0.9 : 0.6)
+                    .opacity(0.9)
                     .multilineTextAlignment(.leading)
             }
-            
-            Spacer()
 
-            HStack(spacing: 12) {
-                if isSystemImage {
-                    Image(systemName: iconName)
-                        .resizable()
-                        .renderingMode(.template)
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 40, height: 40)
-                } else {
-                    Image(iconName)
-                        .resizable()
-                        .renderingMode(.template)
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 40, height: 40)
-                }
-            }
+            Spacer()
+           
+            Image(iconName)
+                .resizable()
+                .renderingMode(.template)
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 40, height: 40)
+                .padding(.trailing, 4)
+                .foregroundColor(.white)
+
+            
+            Image(systemName: "chevron.right")
+                .renderingMode(.template)
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 14, height: 14)
+                .foregroundColor(.white)
+                
         }
         .padding(.vertical, 22)
         .padding(.horizontal, 16)
         .background(backgroundColor)
-        .foregroundColor(foregroundColor)
+        .foregroundColor(.white)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
     }
