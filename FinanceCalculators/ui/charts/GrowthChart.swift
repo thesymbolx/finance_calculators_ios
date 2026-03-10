@@ -5,6 +5,7 @@ struct GrowthChart: View {
     let points: [Point]
     
     private let xScaleDomainMax = 10.0
+    @State private var revealProgress: CGFloat = 1.0
 
     var body: some View {
         Chart {
@@ -53,6 +54,15 @@ struct GrowthChart: View {
             }
         }
         .frame(height: 250)
+        .onChange(of: points) { oldValue, newValue in
+            revealProgress = 0.0
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                withAnimation(.easeInOut(duration: 5.0)) {
+                    revealProgress = 1.0
+                }
+            }
+        }
         .chartXScale(
             domain: points.isEmpty ? 0...xScaleDomainMax : 0...(points.last?.x ?? xScaleDomainMax),
             range: .plotDimension(startPadding: 5, endPadding: 5)
@@ -62,7 +72,6 @@ struct GrowthChart: View {
             range: .plotDimension(startPadding: 0, endPadding: 5)
         )
         .chartYAxis {
-
             AxisMarks { value in
                 AxisValueLabel(
                     format: .currency(code: "GBP").notation(.compactName)
@@ -70,10 +79,17 @@ struct GrowthChart: View {
 
                 if let doubleValue = value.as(Double.self), doubleValue == 0 {
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 1))
-                        .foregroundStyle(.gray.opacity(0.5))  // Optional: makes the 0 line subtle
+                        .foregroundStyle(.gray.opacity(0.5))
                 }
             }
 
+        }
+        .chartPlotStyle { plotArea in
+            plotArea
+                .mask(alignment: .leading) {
+                    Rectangle()
+                        .scaleEffect(x: revealProgress, anchor: .leading)
+                }
         }
     }
 }
