@@ -54,11 +54,11 @@ struct GrowthChart: View {
             }
         }
         .frame(height: 250)
-        .onChange(of: points) { oldValue, newValue in
+        .onChange(of: points) { oldValue, newValue in            
             revealProgress = 0.0
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                withAnimation(.easeInOut(duration: 0.7)) {
+                withAnimation(.easeInOut(duration: 0.5)) {
                     revealProgress = 1.0
                 }
             }
@@ -91,6 +91,7 @@ struct GrowthChart: View {
                         .scaleEffect(x: revealProgress, anchor: .leading)
                 }
         }
+        .animation(.none, value: points)
     }
 }
 

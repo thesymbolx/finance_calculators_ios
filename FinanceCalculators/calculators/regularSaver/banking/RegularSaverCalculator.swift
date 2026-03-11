@@ -29,12 +29,14 @@ struct RegularSaverCalculator: View {
 
                 CompundInterestCalculatorBodyView(
                     state: $viewModel.state,
-                    total: viewModel.state.balance,
+                    total: viewModel.state.balance,	
                     onCalculate: {
-                        viewModel.calculate()
-
                         withAnimation(.linear) {
                             scrollPosition = 0
+                        } completion: {
+                            withAnimation(.easeInOut(duration: 0.5).delay(0.3)) {
+                                viewModel.calculate()
+                            }
                         }
                     },
                     isButtonEnabled: viewModel.isFormValid
@@ -80,6 +82,7 @@ private struct CalculatorHeader: View {
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundColor(Color(.primary))
+                .contentTransition(.numericText(), )
             
             Text("Interest £\(interestEarned)")
                 .font(.subheadline.bold())
