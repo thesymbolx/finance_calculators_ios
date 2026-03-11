@@ -3,9 +3,10 @@ import SwiftUI
 
 struct GrowthChart: View {
     let points: [Point]
-    
+
     private let xScaleDomainMax = 10.0
     @State private var revealProgress: CGFloat = 1.0
+    @State private var selectedX: Double?
 
     var body: some View {
         Chart {
@@ -14,7 +15,9 @@ struct GrowthChart: View {
                 RuleMark(y: .value("Y", 1000)).foregroundStyle(.clear)
 
                 RuleMark(x: .value("X", 0)).foregroundStyle(.clear)
-                RuleMark(x: .value("X", xScaleDomainMax)).foregroundStyle(.clear)
+                RuleMark(x: .value("X", xScaleDomainMax)).foregroundStyle(
+                    .clear
+                )
             } else {
                 ForEach(points) { point in
                     let line = LineMark(
@@ -51,20 +54,33 @@ struct GrowthChart: View {
                         )
                     )
                 }
+
+                if let selectedX {
+                    if let closest = points.min(by: { abs($0.x - selectedX) < abs($1.x - selectedX) }) {
+                        PointMark(
+                            x: .value("X", closest.x),
+                            y: .value("Y", closest.y)
+                        )
+                        .foregroundStyle(Color(.primary))
+                        .symbolSize(100)
+                    }
+                }
             }
         }
         .frame(height: 250)
-        .onChange(of: points) { oldValue, newValue in            
+        .onChange(of: points) { oldValue, newValue in
             revealProgress = 0.0
-            
+
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 withAnimation(.easeInOut(duration: 0.5)) {
                     revealProgress = 1.0
                 }
             }
         }
+        .chartXSelection(value: $selectedX)
         .chartXScale(
-            domain: points.isEmpty ? 0...xScaleDomainMax : 0...(points.last?.x ?? xScaleDomainMax),
+            domain: points.isEmpty
+                ? 0...xScaleDomainMax : 0...(points.last?.x ?? xScaleDomainMax),
             range: .plotDimension(startPadding: 5, endPadding: 5)
         )
         .chartYScale(
