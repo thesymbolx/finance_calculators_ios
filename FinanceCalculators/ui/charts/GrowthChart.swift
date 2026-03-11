@@ -32,9 +32,7 @@ struct GrowthChart: View {
                     } else {
                         line
                     }
-                }
-
-                ForEach(points) { point in
+                    
                     AreaMark(
                         x: .value("Year", point.x),
                         y: .value(
@@ -56,13 +54,32 @@ struct GrowthChart: View {
                 }
 
                 if let selectedX {
-                    if let closest = points.min(by: { abs($0.x - selectedX) < abs($1.x - selectedX) }) {
+                    if let closest = points.min(by: {
+                        abs($0.x - selectedX) < abs($1.x - selectedX)
+                    }) {
                         PointMark(
                             x: .value("X", closest.x),
                             y: .value("Y", closest.y)
                         )
                         .foregroundStyle(Color(.primary))
                         .symbolSize(100)
+                        .annotation(
+                            position: .top,
+                            spacing: 8,
+                            overflowResolution: AnnotationOverflowResolution(x: .fit, y: .disabled)
+                        ) {
+                            VStack {
+                                Text(closest.y, format: .currency(code: "GBP"))
+                                    .font(.caption.bold())
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(
+                                        Color(.systemBackground).opacity(0.8)
+                                    )
+                                    .clipShape(Capsule())
+                                    .shadow(radius: 2)
+                            }
+                        }
                     }
                 }
             }
